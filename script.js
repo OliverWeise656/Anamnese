@@ -1,11 +1,12 @@
-let frequencies = [1000, 750, 500, 2000, 4000, 6000];
+let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = 0;
+let currentDb = -10;
 let results = { right: {}, left: {} };
 let currentSide = '';
 let audioContext;
 let oscillator;
 let gainNode;
+let panner;
 
 function startTest(side) {
   currentSide = side;
@@ -21,13 +22,18 @@ function startTone() {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
   gainNode = audioContext.createGain();
+  panner = audioContext.createStereoPanner();
 
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
 
+  // Set the panner to the appropriate side
+  panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
+
   oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  gainNode.connect(panner);
+  panner.connect(audioContext.destination);
 
   oscillator.start();
 
@@ -35,15 +41,15 @@ function startTone() {
 }
 
 function increaseVolume() {
-  currentDb = 0;
+  currentDb = -10;
   let increaseInterval = setInterval(() => {
     if (currentDb < 90) {
-      currentDb += 1;
-      gainNode.gain.setValueAtTime(currentDb / 100, audioContext.currentTime);
+      currentDb += 0.5;
+      gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
     } else {
       clearInterval(increaseInterval);
     }
-  }, 500);
+  }, 1000);  // Increase interval to 1 second
 }
 
 function heardTone() {
@@ -52,7 +58,7 @@ function heardTone() {
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startTone, Math.random() * (1000 - 250) + 250);
+    setTimeout(startTone, Math.random() * (3000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
       document.getElementById('test').classList.add('hidden');
@@ -61,7 +67,7 @@ function heardTone() {
     } else {
       document.getElementById('test').classList.add('hidden');
       displayResults();
-      drawChart();
+      renderChart();
     }
   }
 }
@@ -92,11 +98,13 @@ function displayResults() {
   });
 
   document.getElementById('results').classList.remove('hidden');
-  document.getElementById('instructions').classList.remove('hidden');
 }
 
-function drawChart() {
+function renderChart() {
   const ctx = document.getElementById('resultsChart').getContext('2d');
+  const rightData = frequencies.map(freq => -results.right[freq] || -90);
+  const leftData = frequencies.map(freq => -results.left[freq] || -90);
+
   new Chart(ctx, {
     type: 'line',
     data: {
@@ -104,36 +112,43 @@ function drawChart() {
       datasets: [
         {
           label: 'Rechts',
-          data: frequencies.map(freq => results.right[freq] || null),
+          data: rightData,
           borderColor: 'red',
-          fill: false
+          fill: false,
+          tension: 0.1
         },
         {
           label: 'Links',
-          data: frequencies.map(freq => results.left[freq] || null),
+          data: leftData,
           borderColor: 'blue',
-          fill: false
+          fill: false,
+          tension: 0.1
         }
       ]
     },
     options: {
       scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value + ' dB';
+            }
+          },
+          title: {
+            display: true,
+            text: 'Hörschwelle (dB)'
+          }
+        },
         x: {
-          type: 'linear',
           title: {
             display: true,
             text: 'Frequenz (Hz)'
           }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Lautstärke (dB)'
-          },
-          suggestedMin: 0,
-          suggestedMax: 90
         }
       }
     }
   });
+
+  document.getElementById('resultsChart').classList.remove('hidden');
 }
