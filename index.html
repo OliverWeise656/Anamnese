@@ -24,6 +24,7 @@
       text-align: center;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <h1>Hörtest</h1>
@@ -48,7 +49,8 @@
       <tbody id="resultsTableBody">
       </tbody>
     </table>
-    <button onclick="startTest('left')">Test für das linke Ohr starten</button>
+    <canvas id="resultsChart" width="400" height="200"></canvas>
+    <button onclick="startTest('left')" id="leftTestButton" class="hidden">Test für das linke Ohr starten</button>
   </div>
   <script src="script.js"></script>
 </body>

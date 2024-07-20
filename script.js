@@ -12,6 +12,7 @@ function startTest(side) {
   currentFrequencyIndex = 0;
   document.getElementById('instructions').classList.add('hidden');
   document.getElementById('results').classList.add('hidden');
+  document.getElementById('leftTestButton').classList.add('hidden');
   document.getElementById('test').classList.remove('hidden');
   startTone();
 }
@@ -51,15 +52,16 @@ function heardTone() {
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startTone, Math.random() * (2000 - 250) + 250);
+    setTimeout(startTone, Math.random() * (1000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
       document.getElementById('test').classList.add('hidden');
       document.getElementById('results').classList.remove('hidden');
+      document.getElementById('leftTestButton').classList.remove('hidden');
     } else {
-      displayResults();
-      document.getElementById('instructions').classList.remove('hidden');
       document.getElementById('test').classList.add('hidden');
+      displayResults();
+      drawChart();
     }
   }
 }
@@ -87,5 +89,51 @@ function displayResults() {
     row.appendChild(rightCell);
     row.appendChild(leftCell);
     tableBody.appendChild(row);
+  });
+
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('instructions').classList.remove('hidden');
+}
+
+function drawChart() {
+  const ctx = document.getElementById('resultsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: frequencies,
+      datasets: [
+        {
+          label: 'Rechts',
+          data: frequencies.map(freq => results.right[freq] || null),
+          borderColor: 'red',
+          fill: false
+        },
+        {
+          label: 'Links',
+          data: frequencies.map(freq => results.left[freq] || null),
+          borderColor: 'blue',
+          fill: false
+        }
+      ]
+    },
+    options: {
+      scales: {
+        x: {
+          type: 'linear',
+          title: {
+            display: true,
+            text: 'Frequenz (Hz)'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Lautstärke (dB)'
+          },
+          suggestedMin: 0,
+          suggestedMax: 90
+        }
+      }
+    }
   });
 }
