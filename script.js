@@ -3,19 +3,20 @@ const maxDecibels = 90;
 let currentEar = 'right';
 let results = { right: [], left: [] };
 let audioCtx, oscillator, gainNode;
+let buttonPressed = false;
 
 function dbToGain(db) {
     return Math.pow(10, db / 20);
 }
 
-async function playTone(frequency) {
+async function playTone(frequency, initialGain = 0.0001) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     oscillator = audioCtx.createOscillator();
     gainNode = audioCtx.createGain();
 
     oscillator.type = 'sine';
     oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(initialGain, audioCtx.currentTime);
 
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
@@ -23,14 +24,16 @@ async function playTone(frequency) {
     oscillator.start();
     console.log(`Playing tone at ${frequency} Hz`);
 
-    let currentGain = 0.0001;
+    let currentGain = initialGain;
     let targetGain = dbToGain(maxDecibels);
 
-    while (currentGain < targetGain) {
+    while (currentGain < targetGain && !buttonPressed) {
         currentGain = Math.min(currentGain * 1.5, targetGain); // Schrittweise Erhöhung
         gainNode.gain.setValueAtTime(currentGain, audioCtx.currentTime + 1);
         await new Promise(resolve => setTimeout(resolve, 1000)); // 1 Sekunde warten
     }
+
+    return currentGain; // Rückgabe der zuletzt erreichten Lautstärke
 }
 
 function stopTone() {
@@ -43,20 +46,39 @@ function stopTone() {
 }
 
 async function testFrequency(frequency) {
-    return new Promise(resolve => {
-        document.getElementById('instructions').innerText = `Frequenz ${frequency} Hz - Drücken Sie die Taste, sobald Sie den Ton hören.`;
-        document.getElementById('startTestBtn').style.display = 'block';
-        document.getElementById('startTestBtn').onclick = () => {
+    document.getElementById('instructions').innerText = `Frequenz ${frequency} Hz - Drücken Sie die Taste, sobald Sie den Ton hören.`;
+    buttonPressed = false;
+    document.getElementById('startTestBtn').style.display = 'none';
+
+    let initialGain = await playTone(frequency);
+
+    await new Promise(resolve => {
+        document.addEventListener('keydown', () => {
+            buttonPressed = true;
+            stopTone();
+            resolve();
+        }, { once: true });
+    });
+
+    console.log('Heard first time, resetting volume...');
+    let reducedGain = initialGain / 2; // Lautstärke nur halb so stark zurücksetzen
+    await playTone(frequency, reducedGain);
+
+    let resultTime = await new Promise(resolve => {
+        document.addEventListener('keydown', () => {
+            buttonPressed = true;
             stopTone();
             resolve(audioCtx.currentTime);
-        };
-        playTone(frequency);
+        }, { once: true });
     });
+
+    return resultTime;
 }
 
 async function startTest(ear) {
     currentEar = ear;
     document.getElementById('startTestBtn').style.display = 'none';
+    document.getElementById('instructions').innerText = 'Drücken Sie eine Taste, wenn Sie einen Ton hören!';
     for (const frequency of frequencies) {
         const result = await testFrequency(frequency);
         results[currentEar].push({ frequency, result });
