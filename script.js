@@ -1,6 +1,5 @@
 const frequencies = [1000, 750, 500, 2000, 4000, 6000];
 const maxDecibels = 90;
-const reductionDecibels = 30;
 let currentEar = 'right';
 let results = { right: [], left: [] };
 let audioCtx, oscillator, gainNode;
@@ -33,8 +32,6 @@ async function playTone(frequency, initialGain = 0.0001) {
         gainNode.gain.setValueAtTime(currentGain, audioCtx.currentTime + 1);
         await new Promise(resolve => setTimeout(resolve, 1000)); // 1 Sekunde warten
     }
-
-    return currentGain; // Rückgabe der zuletzt erreichten Lautstärke
 }
 
 function stopTone() {
@@ -47,47 +44,36 @@ function stopTone() {
 }
 
 async function testFrequency(frequency) {
-    document.getElementById('instructions').innerText = `Frequenz ${frequency} Hz - Drücken Sie die Leertaste, sobald Sie den Ton hören.`;
+    document.getElementById('instructions').innerText = `Frequenz ${frequency} Hz - Drücken Sie die Taste, sobald Sie den Ton hören.`;
     buttonPressed = false;
     document.getElementById('startTestBtn').style.display = 'none';
 
-    let initialGain = await playTone(frequency);
+    await playTone(frequency);
 
     await new Promise(resolve => {
-        const onKeyPress = (e) => {
-            if (e.code === 'Space') {
-                buttonPressed = true;
-                stopTone();
-                document.removeEventListener('keydown', onKeyPress);
-                resolve();
-            }
-        };
-        document.addEventListener('keydown', onKeyPress);
+        document.addEventListener('keydown', () => {
+            buttonPressed = true;
+            stopTone();
+            resolve();
+        }, { once: true });
     });
 
-    console.log('Heard first time, reducing volume...');
-    let reducedGain = initialGain / dbToGain(reductionDecibels);
-    await playTone(frequency, reducedGain);
+    console.log('Heard first time, resetting volume...');
+    await playTone(frequency, 0.0001);
 
-    let resultTime = await new Promise(resolve => {
-        const onKeyPress = (e) => {
-            if (e.code === 'Space') {
-                buttonPressed = true;
-                stopTone();
-                document.removeEventListener('keydown', onKeyPress);
-                resolve(audioCtx.currentTime);
-            }
-        };
-        document.addEventListener('keydown', onKeyPress);
+    return new Promise(resolve => {
+        document.addEventListener('keydown', () => {
+            buttonPressed = true;
+            stopTone();
+            resolve(audioCtx.currentTime);
+        }, { once: true });
     });
-
-    return resultTime;
 }
 
 async function startTest(ear) {
     currentEar = ear;
     document.getElementById('startTestBtn').style.display = 'none';
-    document.getElementById('instructions').innerText = 'Drücken Sie die Leertaste, wenn Sie einen Ton hören!';
+    document.getElementById('instructions').innerText = 'Drücken Sie eine Taste, wenn Sie einen Ton hören!';
     for (const frequency of frequencies) {
         const result = await testFrequency(frequency);
         results[currentEar].push({ frequency, result });
