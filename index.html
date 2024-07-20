@@ -1,19 +1,54 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hörtest</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .hidden {
+      display: none;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 50%;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Hörtest</h1>
-    <p id="instructions">Willkommen zum Hörtest. Klicken Sie auf den untenstehenden Button, um den Test zu starten.</p>
-    <button id="startButton">Test starten</button>
-    <div id="graphContainer" style="display:none;">
-      <canvas id="audiogram" width="800" height="400"></canvas>
-    </div>
+  <h1>Hörtest</h1>
+  <div id="instructions">
+    <p>Willkommen zum Hörtest. Drücken Sie den Start-Button, um zu beginnen.</p>
+    <button onclick="startTest('right')">Test für das rechte Ohr starten</button>
+  </div>
+  <div id="test" class="hidden">
+    <p>Drücken Sie den Knopf, wenn Sie den Ton hören.</p>
+    <button id="heardButton" onclick="heardTone()">Ton gehört</button>
+  </div>
+  <div id="results" class="hidden">
+    <h2>Testergebnisse</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Frequenz (Hz)</th>
+          <th>Rechts (dB)</th>
+          <th>Links (dB)</th>
+        </tr>
+      </thead>
+      <tbody id="resultsTableBody">
+      </tbody>
+    </table>
+    <button onclick="startTest('left')">Test für das linke Ohr starten</button>
   </div>
   <script src="script.js"></script>
 </body>
