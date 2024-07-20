@@ -40,6 +40,9 @@ function playTone(frequency) {
 
 function confirmHearing() {
   oscillator.stop();
+  oscillator.disconnect();
+  gainNode.disconnect();
+  
   results[side].push(frequencies[currentFreqIndex]);
   currentFreqIndex++;
   startTest();
