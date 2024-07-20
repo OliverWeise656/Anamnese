@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hörtest</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hörtest</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Hörtest</h1>
-        <p>Bitte setzen Sie Ihre Kopfhörer auf. Der Test beginnt mit dem rechten Ohr.</p>
-        <button id="startTestBtn" onclick="startTest('right')">Test starten</button>
-        <div id="instructions"></div>
-        <canvas id="audiogram" width="400" height="200"></canvas>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+  <div class="container">
+    <h1>Hörtest</h1>
+    <p id="instruction">Bitte klicken Sie auf den Start-Button, um den Test auf der rechten Seite zu beginnen.</p>
+    <button id="start-btn">Test rechts starten</button>
+    <div id="audiogram"></div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>

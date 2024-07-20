@@ -1,131 +1,61 @@
-const frequencies = [1000, 750, 500, 2000, 4000, 6000];
-const maxDecibels = 90;
-let currentEar = 'right';
+let frequencies = [1000, 750, 500, 2000, 4000, 6000];
+let currentFreqIndex = 0;
+let side = 'right';
 let results = { right: [], left: [] };
-let audioCtx, oscillator, gainNode;
-let buttonPressed = false;
+let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let oscillator, gainNode;
 
-function dbToGain(db) {
-    return Math.pow(10, db / 20);
+document.getElementById('start-btn').addEventListener('click', startTest);
+
+function startTest() {
+  if (currentFreqIndex < frequencies.length) {
+    playTone(frequencies[currentFreqIndex]);
+    document.getElementById('instruction').innerText = `Testet ${frequencies[currentFreqIndex]} Hz auf der ${side}-Seite. Klicken Sie, sobald Sie den Ton hören.`;
+  } else if (side === 'right') {
+    side = 'left';
+    currentFreqIndex = 0;
+    document.getElementById('instruction').innerText = 'Wechseln Sie die Seite und klicken Sie auf den Button, um den Test auf der linken Seite zu starten.';
+    document.getElementById('start-btn').innerText = 'Test links starten';
+  } else {
+    displayResults();
+  }
 }
 
-async function playTone(frequency, initialGain = 0.0001) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    oscillator = audioCtx.createOscillator();
-    gainNode = audioCtx.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(initialGain, audioCtx.currentTime);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start();
-    console.log(`Playing tone at ${frequency} Hz`);
-
-    let currentGain = initialGain;
-    let targetGain = dbToGain(maxDecibels);
-
-    while (currentGain < targetGain && !buttonPressed) {
-        currentGain = Math.min(currentGain * 1.5, targetGain); // Schrittweise Erhöhung
-        gainNode.gain.setValueAtTime(currentGain, audioCtx.currentTime + 1);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 Sekunde warten
-    }
+function playTone(frequency) {
+  oscillator = audioContext.createOscillator();
+  gainNode = audioContext.createGain();
+  
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 3);
+  
+  oscillator.start();
+  
+  document.addEventListener('click', confirmHearing, { once: true });
 }
 
-function stopTone() {
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
-    setTimeout(() => {
-        oscillator.stop();
-        audioCtx.close();
-        console.log('Tone stopped');
-    }, 1000);
-}
-
-async function testFrequency(frequency) {
-    document.getElementById('instructions').innerText = `Frequenz ${frequency} Hz - Drücken Sie die Taste, sobald Sie den Ton hören.`;
-    buttonPressed = false;
-    document.getElementById('startTestBtn').style.display = 'none';
-
-    await playTone(frequency);
-
-    await new Promise(resolve => {
-        document.addEventListener('keydown', () => {
-            buttonPressed = true;
-            stopTone();
-            resolve();
-        }, { once: true });
-    });
-
-    console.log('Heard first time, resetting volume...');
-    await playTone(frequency, 0.0001);
-
-    return new Promise(resolve => {
-        document.addEventListener('keydown', () => {
-            buttonPressed = true;
-            stopTone();
-            resolve(audioCtx.currentTime);
-        }, { once: true });
-    });
-}
-
-async function startTest(ear) {
-    currentEar = ear;
-    document.getElementById('startTestBtn').style.display = 'none';
-    document.getElementById('instructions').innerText = 'Drücken Sie eine Taste, wenn Sie einen Ton hören!';
-    for (const frequency of frequencies) {
-        const result = await testFrequency(frequency);
-        results[currentEar].push({ frequency, result });
-    }
-    if (ear === 'right') {
-        document.getElementById('instructions').innerText = 'Wechseln Sie jetzt auf das linke Ohr und starten Sie den Test erneut.';
-        document.getElementById('startTestBtn').innerText = 'Test für linkes Ohr starten';
-        document.getElementById('startTestBtn').style.display = 'block';
-        document.getElementById('startTestBtn').onclick = () => startTest('left');
-    } else {
-        displayResults();
-    }
+function confirmHearing() {
+  oscillator.stop();
+  results[side].push(frequencies[currentFreqIndex]);
+  currentFreqIndex++;
+  startTest();
 }
 
 function displayResults() {
-    const ctx = document.getElementById('audiogram').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: frequencies,
-            datasets: [
-                {
-                    label: 'Rechts',
-                    data: results.right.map(r => r.result),
-                    borderColor: 'red',
-                    fill: false
-                },
-                {
-                    label: 'Links',
-                    data: results.left.map(r => r.result),
-                    borderColor: 'blue',
-                    fill: false
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Frequenz (Hz)'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Hörschwelle (dB)'
-                    }
-                }
-            }
-        }
-    });
+  document.getElementById('instruction').innerText = 'Der Hörtest ist abgeschlossen. Hier ist Ihr Audiogramm:';
+  document.getElementById('start-btn').style.display = 'none';
+  
+  let audiogram = document.getElementById('audiogram');
+  let table = '<table border="1"><tr><th>Frequenz (Hz)</th><th>Rechts</th><th>Links</th></tr>';
+  
+  frequencies.forEach((freq, index) => {
+    table += `<tr><td>${freq}</td><td>${results.right[index] !== undefined ? 'Hört' : 'Hört nicht'}</td><td>${results.left[index] !== undefined ? 'Hört' : 'Hört nicht'}</td></tr>`;
+  });
+  
+  table += '</table>';
+  audiogram.innerHTML = table;
 }
-
-document.getElementById('startTestBtn').onclick = () => startTest('right');
