@@ -1,36 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hörtest</title>
+  <title>HNO Praxis Chatbot</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
     }
-    .hidden {
-      display: none;
-    }
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 50%;
-    }
-    table, th, td {
-      border: 1px solid black;
-    }
-    th, td {
+    .message {
       padding: 10px;
-      text-align: center;
+      border: 1px solid #ddd;
+      margin: 10px 0;
     }
-    canvas {
-      margin-top: 20px;
+    .user {
+      background-color: #f1f1f1;
+    }
+    .doktor {
+      background-color: #e2f7e1;
+    }
+    #messages {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    #userInput {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    #sendButton {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #sendButton:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <h1>Hörtest</h1>
-  <div id="instructions">
+  <div id="messages"></div>
+  <input type="text" id="userInput" placeholder="Ihre Nachricht...">
+  <button id="sendButton" onclick="sendMessage()">Senden</button>
+
+  <div id="instructions" class="hidden">
     <p>Willkommen zum Hörtest. Drücken Sie den Start-Button, um zu beginnen.</p>
     <button onclick="startTest('right')">Test für das rechte Ohr starten</button>
   </div>
@@ -54,6 +71,7 @@
     <button onclick="startTest('left')" id="leftTestButton" class="hidden">Test für das linke Ohr starten</button>
     <canvas id="resultsChart" width="400" height="200" class="hidden"></canvas>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
