@@ -40,12 +40,39 @@
     #sendButton:hover {
       background-color: #45a049;
     }
+    .hidden {
+      display: none;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 50%;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    canvas {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
+  <h1>HNO Praxis Chatbot</h1>
   <div id="messages"></div>
   <input type="text" id="userInput" placeholder="Ihre Nachricht...">
   <button id="sendButton" onclick="sendMessage()">Senden</button>
+
+  <div id="toneSetting" class="hidden">
+    <h2>Bitte stellen Sie die Lautstärke Ihres Geräts ein</h2>
+    <p>Spielen Sie den Ton ab und stellen Sie sicher, dass Sie ihn gut hören können.</p>
+    <button onclick="startToneTest()">Ton abspielen</button>
+    <button onclick="stopToneTest()">Ton stoppen</button>
+    <button onclick="proceedToHearingTest()">Weiter zum Hörtest</button>
+  </div>
 
   <div id="instructions" class="hidden">
     <p>Willkommen zum Hörtest. Drücken Sie den Start-Button, um zu beginnen.</p>
