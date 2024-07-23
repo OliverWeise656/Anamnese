@@ -607,13 +607,22 @@ function nextHearingWord() {
   if (currentHearingWordIndex < testWords.length) {
     playHearingWord();
   } else {
-    startPureToneTest();
+    showFinalResult();
   }
 }
 
-function startPureToneTest() {
-    document.getElementById('test').style.display = 'none';
-    document.getElementById('hearing-test').style.display = 'block';
+function showFinalResult() {
+  document.getElementById('test').style.display = 'none';
+  document.getElementById('final-result').style.display = 'block';
+  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + score + ' von ' + (numWords + testWords.length);
+  setTimeout(() => {
+    document.getElementById('final-result').style.display = 'none';
+    startHearingTestProcess();
+  }, 3000);
+}
+
+function startHearingTestProcess() {
+  document.getElementById('hearing-test').style.display = 'block';
 }
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
@@ -621,10 +630,6 @@ let currentFrequencyIndex = 0;
 let currentDb = -40; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
-let audioContext;
-let oscillator;
-let gainNode;
-let panner;
 
 function startTest(side) {
   currentSide = side;
@@ -686,6 +691,13 @@ function heardTone() {
       document.getElementById('test').classList.add('hidden');
       displayResults();
       renderChart();
+      setTimeout(() => {
+        if (state.age > 6 && state.age < 16) {
+          window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+        } else if (state.voiceAnalysisRecommended) {
+          window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+        }
+      }, 3000);
     }
   }
 }
@@ -769,17 +781,4 @@ function renderChart() {
   });
 
   document.getElementById('resultsChart').classList.remove('hidden');
-}
-
-function showFinalResult() {
-  document.getElementById('test').style.display = 'none';
-  document.getElementById('final-result').style.display = 'block';
-  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + score + ' von ' + (numWords + testWords.length);
-  setTimeout(() => {
-    if (state.age > 6 && state.age < 16) {
-      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-    } else if (state.voiceAnalysisRecommended) {
-      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-    }
-  }, 3000);
 }
