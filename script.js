@@ -33,7 +33,9 @@ let state = {
     hearingLossIntensity: null,
     weightLoss: null,
     weightLossAmount: null,
-    urgency: 'normal'
+    urgency: 'normal',
+    hearingTestRecommended: false,
+    voiceAnalysisRecommended: false
 };
 
 async function sendMessage() {
@@ -55,12 +57,11 @@ async function sendMessage() {
     await appendRow([userInput, doctorMessage, new Date().toLocaleString()]);
 
     // Überprüfen Sie, ob eine Weiterleitung erforderlich ist
-    if (doctorMessage.includes('Hörtest') || doctorMessage.includes('Stimmanalyse')) {
+    if (state.hearingTestRecommended || state.voiceAnalysisRecommended) {
         setTimeout(() => {
-            if (doctorMessage.includes('Hörtest')) {
-                setTimeout(clearScreen, 5000);
-                setTimeout(() => document.getElementById('toneSetting').classList.remove('hidden'), 5000);
-            } else if (doctorMessage.includes('Stimmanalyse')) {
+            if (state.hearingTestRecommended) {
+                startToneSetting();
+            } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://classic-broadleaf-blender.glitch.me';
             }
         }, 3000); // 3 Sekunden Verzögerung
@@ -100,6 +101,7 @@ async function getDoctorResponse(userInput) {
         } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
         } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')) {
+            state.voiceAnalysisRecommended = true;
             return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
         }
         return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
@@ -154,6 +156,7 @@ async function getDoctorResponse(userInput) {
                 return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
             }
         } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
+            state.hearingTestRecommended = true;
             if (state.hearingLossDuration === null) {
                 state.hearingLossDuration = userInput.toLowerCase();
                 return 'In welchem Ohr haben Sie die Hörprobleme?';
@@ -385,9 +388,11 @@ function createAnamnesis() {
 function getAdditionalRecommendations(reason, age) {
     let recommendation = '';
     if (age > 4) {
+        state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest zu machen.';
     }
     if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimme')) {
+        state.voiceAnalysisRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse zu machen.';
     }
     return recommendation;
@@ -451,203 +456,170 @@ async function appendRow(values) {
     }
 }
 
-// Hörtest Funktionen
-let frequencies = [500, 750, 1000, 2000, 4000, 6000];
-let currentFrequencyIndex = 0;
-let currentDb = -40; // Startlautstärke auf -40 dB setzen
-let results = { right: {}, left: {} };
-let currentSide = '';
+// Tone setting functions
 let audioContext;
 let oscillator;
 let gainNode;
-let panner;
 
-function startToneTest() {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    oscillator = audioContext.createOscillator();
-    gainNode = audioContext.createGain();
-    
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Leiser Ton
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.start();
-}
-
-function stopToneTest() {
-    if (oscillator) {
-        oscillator.stop();
-        audioContext.close();
-    }
-}
-
-function proceedToHearingTest() {
-    document.getElementById('toneSetting').classList.add('hidden');
-    document.getElementById('instructions').classList.remove('hidden');
-}
-
-function startTest(side) {
-  currentSide = side;
-  currentFrequencyIndex = 0;
-  document.getElementById('instructions').classList.add('hidden');
-  document.getElementById('results').classList.add('hidden');
-  document.getElementById('leftTestButton').classList.add('hidden');
-  document.getElementById('test').classList.remove('hidden');
-  startTone();
-}
+document.getElementById("startButton").addEventListener("click", startTone);
+document.getElementById("stopButton").addEventListener("click", stopTone);
 
 function startTone() {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
-  gainNode = audioContext.createGain();
-  panner = audioContext.createStereoPanner();
-
   oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
-  gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
-
-  // Set the panner to the appropriate side
-  panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
-
+  oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+  gainNode = audioContext.createGain();
+  gainNode.gain.setValueAtTime(0.01, audioContext.currentTime);
   oscillator.connect(gainNode);
-  gainNode.connect(panner);
-  panner.connect(audioContext.destination);
-
+  gainNode.connect(audioContext.destination);
   oscillator.start();
-
-  increaseVolume();
-}
-
-function increaseVolume() {
-  currentDb = -40; // Startlautstärke auf -40 dB setzen
-  let increaseInterval = setInterval(() => {
-    if (currentDb < 90) {
-      currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
-      gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
-    } else {
-      clearInterval(increaseInterval);
-    }
-  }, 1000);  // Erhöhungsintervall auf 1 Sekunde setzen
-}
-
-function heardTone() {
-  results[currentSide][frequencies[currentFrequencyIndex]] = currentDb;
-  stopTone();
-
-  if (currentFrequencyIndex < frequencies.length - 1) {
-    currentFrequencyIndex++;
-    setTimeout(startTone, Math.random() * (1000 - 250) + 250);
-  } else {
-    if (currentSide === 'right') {
-      document.getElementById('test').classList.add('hidden');
-      document.getElementById('results').classList.remove('hidden');
-      document.getElementById('leftTestButton').classList.remove('hidden');
-    } else {
-      document.getElementById('test').classList.add('hidden');
-      displayResults();
-      renderChart();
-    }
-  }
+  document.getElementById("startButton").disabled = true;
+  document.getElementById("stopButton").disabled = false;
 }
 
 function stopTone() {
   oscillator.stop();
   audioContext.close();
+  document.getElementById("startButton").disabled = false;
+  document.getElementById("stopButton").disabled = true;
+  startInitialTest();
 }
 
-function displayResults() {
-  let tableBody = document.getElementById('resultsTableBody');
-  tableBody.innerHTML = '';
-
-  frequencies.forEach(freq => {
-    let row = document.createElement('tr');
-    let freqCell = document.createElement('td');
-    let rightCell = document.createElement('td');
-    let leftCell = document.createElement('td');
-
-    freqCell.textContent = freq;
-    rightCell.textContent = results.right[freq] || 'N/A';
-    leftCell.textContent = results.left[freq] || 'N/A';
-
-    row.appendChild(freqCell);
-    row.appendChild(rightCell);
-    row.appendChild(leftCell);
-    tableBody.appendChild(row);
-  });
-
-  document.getElementById('results').classList.remove('hidden');
+function startToneSetting() {
+    document.getElementById('chatbot').style.display = 'none';
+    document.getElementById('tone-setting').style.display = 'block';
 }
 
-function renderChart() {
-  const ctx = document.getElementById('resultsChart').getContext('2d');
-  const rightData = frequencies.map(freq => -results.right[freq] || -90);
-  const leftData = frequencies.map(freq => -results.left[freq] || -90);
+function startInitialTest() {
+    document.getElementById('tone-setting').style.display = 'none';
+    document.getElementById('initial-test').style.display = 'block';
+}
 
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: frequencies,
-      datasets: [
-        {
-          label: 'Rechts',
-          data: rightData,
-          borderColor: 'red',
-          fill: false,
-          tension: 0.1
-        },
-        {
-          label: 'Links',
-          data: leftData,
-          borderColor: 'blue',
-          fill: false,
-          tension: 0.1
-        }
-      ]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return value + ' dB';
-            }
-          },
-          title: {
-            display: true,
-            text: 'Hörschwelle (dB)'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Frequenz (Hz)'
-          }
-        }
-      }
+const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisch", "stuhl", "auto", 
+               "rad", "uhr", "buch", "glas", "fenster", "tür", "weg", "licht", "bild", "zug", 
+               "boot", "stadt", "dorf", "berg", "fluss", "meer", "insel", "sonne", "mond", "stern", 
+               "gold", "geld", "hand", "kopf", "bein", "fuß", "ohr", "mund", "nase", "auge", 
+               "brot", "kuchen", "salz", "zucker", "milch", "kaffee", "tee", "wein", "bier", "wasser",
+               "rock", "hose", "hemd", "jacke", "schuh", "ring", "kette", "hut", "schirm", "uhr", 
+               "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
+               "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
+const selectedWords = [];
+const numWords = 20;
+let currentWordIndex = 0;
+let score = 0;
+
+// Shuffle array and select first 20 unique words
+while (selectedWords.length < numWords) {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const word = words[randomIndex];
+    if (!selectedWords.includes(word)) {
+        selectedWords.push(word);
     }
-  });
-
-  document.getElementById('resultsChart').classList.remove('hidden');
 }
 
-function clearScreen() {
-    document.getElementById('messages').innerHTML = '';
-    document.getElementById('userInput').value = '';
-    document.getElementById('messages').classList.add('hidden');
-    document.getElementById('sendButton').classList.add('hidden');
+document.getElementById('start-button').addEventListener('click', startTest);
+document.getElementById('submit-button').addEventListener('click', checkAnswer);
+
+function startTest() {
+    document.getElementById('start-button').style.display = 'none';
+    document.getElementById('test-area').style.display = 'block';
+    playWord();
 }
 
-function proceedToSpeechTest() {
-    setTimeout(clearScreen, 5000);
-    setTimeout(() => window.location.href = 'https://bronzed-branch-helicopter.glitch.me', 5000);
+function playWord() {
+    const word = selectedWords[currentWordIndex];
+    const audio = new SpeechSynthesisUtterance(word);
+    window.speechSynthesis.speak(audio);
 }
 
-function proceedToNextTest() {
-    document.getElementById('results').classList.add('hidden');
-    setTimeout(clearScreen, 5000);
-    setTimeout(proceedToSpeechTest, 5000);
+function checkAnswer() {
+    const userAnswer = document.getElementById('answer-input').value.trim().toLowerCase();
+    const correctAnswer = selectedWords[currentWordIndex];
+    if (userAnswer === correctAnswer) {
+        score++;
+    }
+    currentWordIndex++;
+    document.getElementById('answer-input').value = '';
+    if (currentWordIndex < numWords) {
+        playWord();
+    } else {
+        showInitialResult();
+    }
+}
+
+function showInitialResult() {
+    document.getElementById('test-area').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').innerText = 'Test beendet! Deine Punktzahl: ' + score + ' von ' + numWords;
+    setTimeout(startHearingTest, 3000);
+}
+
+// --- Ab hier ist der Hörtest im Störschall Teil ---
+const audioFiles = [
+  {name: 'Schuh', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Schuh.m4a?v=1720614938001'},
+  {name: 'Sohn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Sohn.m4a?v=1720614938455'},
+  {name: 'weiß', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/wei%C3%9F.m4a?v=1720614938967'},
+  {name: 'Zahn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Zahn.m4a?v=1720614939437'},
+  {name: 'brav', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/brav.m4a?v=1720614939817'},
+  {name: 'Baum', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Baum.m4a?v=1720614940236'},
+  {name: 'Dach', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Dach.m4a?v=1720614940678'},
+  {name: 'Fass', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Fass.m4a?v=1720614941077'},
+  {name: 'Hund', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Hund.m4a?v=1720614941430'},
+  {name: 'klein', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/klein.m4a?v=1720614941788'},
+  {name: 'laut', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/laut.m4a?v=1720614942187'},
+  {name: 'Mann', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Mann.m4a?v=1720614942555'},
+  {name: 'nass', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/nass.m4a?v=1720614942946'},
+  {name: 'Raum', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Raum.m4a?v=1720614943371'},
+  {name: 'Saal', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Saal.m4a?v=1720614943788'}
+];
+
+let testWords = [];
+let currentHearingWordIndex = 0;
+
+function startHearingTest() {
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('test').style.display = 'block';
+    startHearingTestSequence();
+}
+
+function startHearingTestSequence() {
+  testWords = audioFiles.sort(() => 0.5 - Math.random()).slice(0, 10);
+  currentHearingWordIndex = 0;
+  playHearingWord();
+}
+
+function playHearingWord() {
+  const audioPlayer = document.getElementById('audioPlayer');
+  audioPlayer.src = testWords[currentHearingWordIndex].url;
+  audioPlayer.play();
+}
+
+document.getElementById('nextButton').addEventListener('click', nextHearingWord);
+
+function nextHearingWord() {
+  const response = document.getElementById('response').value.trim();
+  if (response.toLowerCase() === testWords[currentHearingWordIndex].name.toLowerCase()) {
+    score++;
+  }
+  document.getElementById('response').value = '';
+  currentHearingWordIndex++;
+  if (currentHearingWordIndex < testWords.length) {
+    playHearingWord();
+  } else {
+    showFinalResult();
+  }
+}
+
+function showFinalResult() {
+  document.getElementById('test').style.display = 'none';
+  document.getElementById('final-result').style.display = 'block';
+  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + score + ' von ' + (numWords + testWords.length);
+  setTimeout(() => {
+    if (state.age > 6 && state.age < 16) {
+      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+    } else if (state.voiceAnalysisRecommended) {
+      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+    }
+  }, 3000);
 }
