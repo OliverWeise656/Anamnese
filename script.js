@@ -639,6 +639,7 @@ function startTest(side) {
   document.getElementById('instructions').classList.add('hidden');
   document.getElementById('results').classList.add('hidden');
   document.getElementById('leftTestButton').classList.add('hidden');
+  document.getElementById('right-test-done').classList.add('hidden');
   document.getElementById('test').classList.remove('hidden');
   startToneHearingTest();
 }
@@ -687,7 +688,7 @@ function heardTone() {
   } else {
     if (currentSide === 'right') {
       document.getElementById('test').classList.add('hidden');
-      document.getElementById('results').classList.remove('hidden');
+      document.getElementById('right-test-done').classList.remove('hidden');
       document.getElementById('leftTestButton').classList.remove('hidden');
     } else {
       document.getElementById('test').classList.add('hidden');
