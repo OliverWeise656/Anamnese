@@ -637,10 +637,8 @@ function startTest(side) {
   currentSide = side;
   currentFrequencyIndex = 0;
   document.getElementById('instructions').classList.add('hidden');
-  document.getElementById('results').classList.add('hidden');
-  document.getElementById('leftTestButton').classList.add('hidden');
   document.getElementById('right-test-done').classList.add('hidden');
-  document.getElementById('test').classList.remove('hidden');
+  document.getElementById('test-area').classList.remove('hidden');
   startToneHearingTest();
 }
 
@@ -687,11 +685,10 @@ function heardTone() {
     setTimeout(startToneHearingTest, Math.random() * (1000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
-      document.getElementById('test').classList.add('hidden');
+      document.getElementById('test-area').classList.add('hidden');
       document.getElementById('right-test-done').classList.remove('hidden');
-      document.getElementById('leftTestButton').classList.remove('hidden');
     } else {
-      document.getElementById('test').classList.add('hidden');
+      document.getElementById('test-area').classList.add('hidden');
       displayResults();
       renderChart();
       setTimeout(() => {
