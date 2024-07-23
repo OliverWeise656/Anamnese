@@ -480,8 +480,6 @@ function startTone() {
 
 function stopTone() {
   oscillator.stop();
-  oscillator.disconnect();
-  gainNode.disconnect();
   audioContext.close();
   document.getElementById("startButton").disabled = false;
   document.getElementById("stopButton").disabled = true;
@@ -520,11 +518,11 @@ while (selectedWords.length < numWords) {
     }
 }
 
-document.getElementById('start-button').addEventListener('click', startTest);
-document.getElementById('submit-button').addEventListener('click', checkAnswer);
+document.getElementById('start-initial-test-button').addEventListener('click', startInitialTestSequence);
+document.getElementById('submit-initial-test-button').addEventListener('click', checkAnswer);
 
-function startTest() {
-    document.getElementById('start-button').style.display = 'none';
+function startInitialTestSequence() {
+    document.getElementById('start-initial-test-button').style.display = 'none';
     document.getElementById('test-area').style.display = 'block';
     playWord();
 }
@@ -552,8 +550,8 @@ function checkAnswer() {
 
 function showInitialResult() {
     document.getElementById('test-area').style.display = 'none';
-    document.getElementById('result').style.display = 'block';
-    document.getElementById('result').innerText = 'Test beendet! Deine Punktzahl: ' + score + ' von ' + numWords;
+    document.getElementById('initial-test-result').style.display = 'block';
+    document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + score + ' von ' + numWords;
     setTimeout(startHearingTest, 3000);
 }
 
@@ -580,7 +578,7 @@ let testWords = [];
 let currentHearingWordIndex = 0;
 
 function startHearingTest() {
-    document.getElementById('result').style.display = 'none';
+    document.getElementById('initial-test-result').style.display = 'none';
     document.getElementById('test').style.display = 'block';
     startHearingTestSequence();
 }
