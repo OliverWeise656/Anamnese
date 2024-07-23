@@ -651,3 +651,130 @@ function proceedToNextTest() {
     setTimeout(clearScreen, 5000);
     setTimeout(proceedToSpeechTest, 5000);
 }
+const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisch", "stuhl", "auto", 
+               "rad", "uhr", "buch", "glas", "fenster", "tür", "weg", "licht", "bild", "zug", 
+               "boot", "stadt", "dorf", "berg", "fluss", "meer", "insel", "sonne", "mond", "stern", 
+               "gold", "geld", "hand", "kopf", "bein", "fuß", "ohr", "mund", "nase", "auge", 
+               "brot", "kuchen", "salz", "zucker", "milch", "kaffee", "tee", "wein", "bier", "wasser",
+               "rock", "hose", "hemd", "jacke", "schuh", "ring", "kette", "hut", "schirm", "uhr", 
+               "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
+               "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
+const selectedWords = [];
+const numWords = 10;
+let currentWordIndex = 0;
+let score = 0;
+
+// Shuffle array and select first 20 unique words
+while (selectedWords.length < numWords) {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const word = words[randomIndex];
+    if (!selectedWords.includes(word)) {
+        selectedWords.push(word);
+    }
+}
+
+document.getElementById('start-button').addEventListener('click', startTest);
+document.getElementById('submit-button').addEventListener('click', checkAnswer);
+
+function startTest() {
+    document.getElementById('start-button').style.display = 'none';
+    document.getElementById('test-area').style.display = 'block';
+    playWord();
+}
+
+function playWord() {
+    const word = selectedWords[currentWordIndex];
+    const audio = new SpeechSynthesisUtterance(word);
+    window.speechSynthesis.speak(audio);
+}
+
+function checkAnswer() {
+    const userAnswer = document.getElementById('answer-input').value.trim().toLowerCase();
+    const correctAnswer = selectedWords[currentWordIndex];
+    if (userAnswer === correctAnswer) {
+        score++;
+    }
+    currentWordIndex++;
+    document.getElementById('answer-input').value = '';
+    if (currentWordIndex < numWords) {
+        playWord();
+    } else {
+        showInitialResult();
+    }
+}
+
+function showInitialResult() {
+    document.getElementById('test-area').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').innerText = 'Test beendet! Deine Punktzahl: ' + score + ' von ' + numWords;
+    setTimeout(startHearingTest, 3000);
+}
+
+// --- Ab hier ist der Hörtest im Störschall Teil ---
+const audioFiles = [
+  {name: 'Schuh', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Schuh.m4a?v=1720614938001'},
+  {name: 'Sohn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Sohn.m4a?v=1720614938455'},
+  {name: 'weiß', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/wei%C3%9F.m4a?v=1720614938967'},
+  {name: 'Zahn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Zahn.m4a?v=1720614939437'},
+  {name: 'brav', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/brav.m4a?v=1720614939817'},
+  {name: 'Baum', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Baum.m4a?v=1720614940236'},
+  {name: 'Dach', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Dach.m4a?v=1720614940678'},
+  {name: 'Fass', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Fass.m4a?v=1720614941077'},
+  {name: 'Hund', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Hund.m4a?v=1720614941430'},
+  {name: 'klein', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/klein.m4a?v=1720614941788'},
+  {name: 'laut', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/laut.m4a?v=1720614942187'},
+  {name: 'Mann', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Mann.m4a?v=1720614942555'},
+  {name: 'nass', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/nass.m4a?v=1720614942946'},
+  {name: 'Raum', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Raum.m4a?v=1720614943371'},
+  {name: 'Saal', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Saal.m4a?v=1720614943788'}
+];
+
+let testWords = [];
+let currentHearingWordIndex = 0;
+
+function startHearingTest() {
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('test').style.display = 'block';
+    startHearingTestSequence();
+}
+
+function startHearingTestSequence() {
+  testWords = audioFiles.sort(() => 0.5 - Math.random()).slice(0, 10);
+  currentHearingWordIndex = 0;
+  playHearingWord();
+}
+
+function playHearingWord() {
+  const audioPlayer = document.getElementById('audioPlayer');
+  audioPlayer.src = testWords[currentHearingWordIndex].url;
+  audioPlayer.play();
+}
+
+document.getElementById('nextButton').addEventListener('click', nextHearingWord);
+
+function nextHearingWord() {
+  const response = document.getElementById('response').value.trim();
+  if (response.toLowerCase() === testWords[currentHearingWordIndex].name.toLowerCase()) {
+    score++;
+  }
+  document.getElementById('response').value = '';
+  currentHearingWordIndex++;
+  if (currentHearingWordIndex < testWords.length) {
+    playHearingWord();
+  } else {
+    showFinalResult();
+  }
+}
+
+function showFinalResult() {
+  document.getElementById('test').style.display = 'none';
+  document.getElementById('final-result').style.display = 'block';
+  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + score + ' von ' + (numWords + testWords.length);
+  setTimeout(() => {
+    if (state.age > 6 && state.age < 16) {
+      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+    } else if (state.voiceAnalysisRecommended) {
+      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+    }
+  }, 3000);
+}
