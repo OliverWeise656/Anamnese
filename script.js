@@ -522,6 +522,7 @@ document.getElementById('start-initial-test-button').addEventListener('click', s
 document.getElementById('submit-initial-test-button').addEventListener('click', checkAnswer);
 
 function startInitialTestSequence() {
+    document.getElementById('initial-instructions').style.display = 'none';
     document.getElementById('start-initial-test-button').style.display = 'none';
     document.getElementById('test-area').style.display = 'block';
     playWord();
