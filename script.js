@@ -480,6 +480,8 @@ function startTone() {
 
 function stopTone() {
   oscillator.stop();
+  oscillator.disconnect();
+  gainNode.disconnect();
   audioContext.close();
   document.getElementById("startButton").disabled = false;
   document.getElementById("stopButton").disabled = true;
@@ -638,10 +640,10 @@ function startTest(side) {
   document.getElementById('results').classList.add('hidden');
   document.getElementById('leftTestButton').classList.add('hidden');
   document.getElementById('test').classList.remove('hidden');
-  startTone();
+  startToneHearingTest();
 }
 
-function startTone() {
+function startToneHearingTest() {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   oscillator = audioContext.createOscillator();
   gainNode = audioContext.createGain();
@@ -677,11 +679,11 @@ function increaseVolume() {
 
 function heardTone() {
   results[currentSide][frequencies[currentFrequencyIndex]] = currentDb;
-  stopTone();
+  stopToneHearingTest();
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startTone, Math.random() * (1000 - 250) + 250);
+    setTimeout(startToneHearingTest, Math.random() * (1000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
       document.getElementById('test').classList.add('hidden');
@@ -702,8 +704,10 @@ function heardTone() {
   }
 }
 
-function stopTone() {
+function stopToneHearingTest() {
   oscillator.stop();
+  oscillator.disconnect();
+  gainNode.disconnect();
   audioContext.close();
 }
 
