@@ -522,6 +522,7 @@ document.getElementById('start-initial-test-button').addEventListener('click', s
 document.getElementById('submit-initial-test-button').addEventListener('click', checkAnswer);
 
 function startInitialTestSequence() {
+    document.getElementById('initial-test-heading').style.display = 'none';
     document.getElementById('initial-instructions').style.display = 'none';
     document.getElementById('start-initial-test-button').style.display = 'none';
     document.getElementById('test-area').style.display = 'block';
@@ -579,7 +580,7 @@ let testWords = [];
 let currentHearingWordIndex = 0;
 
 function startHearingTest() {
-    document.getElementById('initial-test-result').style.display = 'none';
+    document.getElementById('initial-test').style.display = 'none';
     document.getElementById('test').style.display = 'block';
     startHearingTestSequence();
 }
