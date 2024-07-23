@@ -691,13 +691,7 @@ function heardTone() {
       document.getElementById('test-area').classList.add('hidden');
       displayResults();
       renderChart();
-      setTimeout(() => {
-        if (state.age > 6 && state.age < 16) {
-          window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-        } else if (state.voiceAnalysisRecommended) {
-          window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-        }
-      }, 3000);
+      saveResultsAsPDF();
     }
   }
 }
@@ -783,4 +777,66 @@ function renderChart() {
   });
 
   document.getElementById('resultsChart').classList.remove('hidden');
+}
+
+function saveResultsAsPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text('Anamnese und Testergebnisse', 10, 10);
+  doc.text('Alter des Patienten: ' + state.age, 10, 20);
+  doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
+
+  let yPosition = 40;
+
+  if (state.painDuration) {
+    doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
+    yPosition += 10;
+    doc.text('Schmerzintensität: ' + state.painIntensity, 10, yPosition);
+    yPosition += 10;
+  }
+
+  if (state.dizzinessDuration) {
+    doc.text('Schwindel seit: ' + state.dizzinessDuration, 10, yPosition);
+    yPosition += 10;
+    doc.text('Schwindelintensität: ' + state.dizzinessIntensity, 10, yPosition);
+    yPosition += 10;
+  }
+
+  if (state.tinnitusDuration) {
+    doc.text('Ohrgeräusche/Tinnitus seit: ' + state.tinnitusDuration, 10, yPosition);
+    yPosition += 10;
+    doc.text('Ohr: ' + state.tinnitusEar, 10, yPosition);
+    yPosition += 10;
+    doc.text('Tinnitusintensität: ' + state.tinnitusIntensity, 10, yPosition);
+    yPosition += 10;
+  }
+
+  if (state.hearingLossDuration) {
+    doc.text('Hörprobleme seit: ' + state.hearingLossDuration, 10, yPosition);
+    yPosition += 10;
+    doc.text('Ohr: ' + state.hearingLossEar, 10, yPosition);
+    yPosition += 10;
+    doc.text('Hörproblemeintensität: ' + state.hearingLossIntensity, 10, yPosition);
+    yPosition += 10;
+  }
+
+  if (state.weightLoss !== null && state.weightLoss !== 'nein') {
+    doc.text('Unfreiwilliger Gewichtsverlust: ' + state.weightLoss, 10, yPosition);
+    yPosition += 10;
+    if (state.weightLossAmount !== null) {
+      doc.text('Details zum Gewichtsverlust: ' + state.weightLossAmount, 10, yPosition);
+      yPosition += 10;
+    }
+  }
+
+  doc.text('Testergebnisse:', 10, yPosition);
+  yPosition += 10;
+
+  frequencies.forEach(freq => {
+    doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
+    yPosition += 10;
+  });
+
+  doc.save('Anamnese_und_Testergebnisse.pdf');
 }
