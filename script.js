@@ -522,6 +522,7 @@ document.getElementById('start-initial-test-button').addEventListener('click', s
 document.getElementById('submit-initial-test-button').addEventListener('click', checkAnswer);
 
 function startInitialTestSequence() {
+    document.getElementById('start-initial-test-header').style.display = 'none'; // Überschrift ausblenden
     document.getElementById('start-initial-test-button').style.display = 'none';
     document.getElementById('test-area').style.display = 'block';
     playWord();
@@ -578,7 +579,7 @@ let testWords = [];
 let currentHearingWordIndex = 0;
 
 function startHearingTest() {
-    document.getElementById('initial-test-result').style.display = 'none';
+    document.getElementById('initial-test').style.display = 'none'; // Sprachverständnis Test und Überschrift ausblenden
     document.getElementById('test').style.display = 'block';
     startHearingTestSequence();
 }
@@ -783,4 +784,49 @@ function renderChart() {
   });
 
   document.getElementById('resultsChart').classList.remove('hidden');
+}
+
+function showFinalResultGraph() {
+  const ctx = document.getElementById('finalResultChart').getContext('2d');
+  const data = {
+    labels: ["Sprachverständnis", "Sprache im Störschall"],
+    datasets: [{
+      label: "Testergebnisse",
+      data: [score, score - currentHearingWordIndex], // Beispielwerte
+      backgroundColor: ["#3e95cd", "#8e5ea2"]
+    }]
+  };
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: "Ergebnisse der Hörtests"
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+
+  document.getElementById('finalResultChart').style.display = 'block';
+}
+
+function showFinalResult() {
+  document.getElementById('test').style.display = 'none';
+  showFinalResultGraph();
+  setTimeout(() => {
+    if (state.age > 6 && state.age < 16) {
+      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+    } else if (state.voiceAnalysisRecommended) {
+      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+    }
+  }, 3000);
 }
