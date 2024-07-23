@@ -33,7 +33,9 @@ let state = {
     hearingLossIntensity: null,
     weightLoss: null,
     weightLossAmount: null,
-    urgency: 'normal'
+    urgency: 'normal',
+    hearingTestRecommended: false,
+    voiceAnalysisRecommended: false
 };
 
 async function sendMessage() {
@@ -55,12 +57,11 @@ async function sendMessage() {
     await appendRow([userInput, doctorMessage, new Date().toLocaleString()]);
 
     // Überprüfen Sie, ob eine Weiterleitung erforderlich ist
-    if (doctorMessage.includes('Hörtest') || doctorMessage.includes('Stimmanalyse')) {
+    if (state.hearingTestRecommended || state.voiceAnalysisRecommended) {
         setTimeout(() => {
-            if (doctorMessage.includes('Hörtest')) {
-                setTimeout(clearScreen, 5000);
-                setTimeout(() => document.getElementById('toneSetting').classList.remove('hidden'), 5000);
-            } else if (doctorMessage.includes('Stimmanalyse')) {
+            if (state.hearingTestRecommended) {
+                startToneSetting();
+            } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://classic-broadleaf-blender.glitch.me';
             }
         }, 3000); // 3 Sekunden Verzögerung
@@ -100,6 +101,7 @@ async function getDoctorResponse(userInput) {
         } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
         } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')) {
+            state.voiceAnalysisRecommended = true;
             return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
         }
         return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
@@ -154,6 +156,7 @@ async function getDoctorResponse(userInput) {
                 return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
             }
         } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
+            state.hearingTestRecommended = true;
             if (state.hearingLossDuration === null) {
                 state.hearingLossDuration = userInput.toLowerCase();
                 return 'In welchem Ohr haben Sie die Hörprobleme?';
@@ -385,9 +388,11 @@ function createAnamnesis() {
 function getAdditionalRecommendations(reason, age) {
     let recommendation = '';
     if (age > 4) {
+        state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest zu machen.';
     }
     if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimme')) {
+        state.voiceAnalysisRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse zu machen.';
     }
     return recommendation;
@@ -451,6 +456,37 @@ async function appendRow(values) {
     }
 }
 
+// Tone setting functions
+function startTone() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    oscillator = audioContext.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+    gainNode = audioContext.createGain();
+    gainNode.gain.setValueAtTime(0.01, audioContext.currentTime);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start();
+    document.getElementById("startButton").disabled = true;
+    document.getElementById("stopButton").disabled = false; // Aktiviert den "Stopp"-Button
+}
+
+function stopTone() {
+    if (oscillator) {
+        oscillator.stop();
+        oscillator.disconnect();
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
+    document.getElementById("startButton").disabled = false;
+    document.getElementById("stopButton").disabled = true;
+    setTimeout(startToneTest, 5000);  // Nach 5 Sekunden zum Hörtest weiterleiten
+}
+document.getElementById("startButton").addEventListener("click", startTone);
+document.getElementById("stopButton").addEventListener("click", stopTone);
+
+
 // Hörtest Funktionen
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
@@ -482,20 +518,21 @@ function stopToneTest() {
         oscillator.stop();
         audioContext.close();
     }
+    proceedToHearingTest();
 }
 
 function proceedToHearingTest() {
-    document.getElementById('toneSetting').classList.add('hidden');
-    document.getElementById('instructions').classList.remove('hidden');
+    document.getElementById('tone-setting').style.display = 'none';
+    document.getElementById('tone-test').style.display = 'block';
 }
 
 function startTest(side) {
   currentSide = side;
   currentFrequencyIndex = 0;
-  document.getElementById('instructions').classList.add('hidden');
-  document.getElementById('results').classList.add('hidden');
-  document.getElementById('leftTestButton').classList.add('hidden');
-  document.getElementById('test').classList.remove('hidden');
+  document.getElementById('instructions').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('leftTestButton').style.display = 'none';
+  document.getElementById('test').style.display = 'block';
   startTone();
 }
 
@@ -542,11 +579,11 @@ function heardTone() {
     setTimeout(startTone, Math.random() * (1000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
-      document.getElementById('test').classList.add('hidden');
-      document.getElementById('results').classList.remove('hidden');
-      document.getElementById('leftTestButton').classList.remove('hidden');
+      document.getElementById('test').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('leftTestButton').style.display = 'block';
     } else {
-      document.getElementById('test').classList.add('hidden');
+      document.getElementById('test').style.display = 'none';
       displayResults();
       renderChart();
     }
@@ -578,7 +615,7 @@ function displayResults() {
     tableBody.appendChild(row);
   });
 
-  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').style.display = 'block';
 }
 
 function renderChart() {
@@ -631,26 +668,10 @@ function renderChart() {
     }
   });
 
-  document.getElementById('resultsChart').classList.remove('hidden');
+  document.getElementById('resultsChart').style.display = 'block';
 }
 
-function clearScreen() {
-    document.getElementById('messages').innerHTML = '';
-    document.getElementById('userInput').value = '';
-    document.getElementById('messages').classList.add('hidden');
-    document.getElementById('sendButton').classList.add('hidden');
-}
-
-function proceedToSpeechTest() {
-    setTimeout(clearScreen, 5000);
-    setTimeout(() => window.location.href = 'https://bronzed-branch-helicopter.glitch.me', 5000);
-}
-
-function proceedToNextTest() {
-    document.getElementById('results').classList.add('hidden');
-    setTimeout(clearScreen, 5000);
-    setTimeout(proceedToSpeechTest, 5000);
-}
+// Sprachverständnis-Test Funktionen
 const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisch", "stuhl", "auto", 
                "rad", "uhr", "buch", "glas", "fenster", "tür", "weg", "licht", "bild", "zug", 
                "boot", "stadt", "dorf", "berg", "fluss", "meer", "insel", "sonne", "mond", "stern", 
@@ -673,10 +694,10 @@ while (selectedWords.length < numWords) {
     }
 }
 
-document.getElementById('start-button').addEventListener('click', startTest);
+document.getElementById('start-button').addEventListener('click', startInitialTest);
 document.getElementById('submit-button').addEventListener('click', checkAnswer);
 
-function startTest() {
+function startInitialTest() {
     document.getElementById('start-button').style.display = 'none';
     document.getElementById('test-area').style.display = 'block';
     playWord();
@@ -710,7 +731,7 @@ function showInitialResult() {
     setTimeout(startHearingTest, 3000);
 }
 
-// --- Ab hier ist der Hörtest im Störschall Teil ---
+// Hörtest im Störschall Funktionen
 const audioFiles = [
   {name: 'Schuh', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Schuh.m4a?v=1720614938001'},
   {name: 'Sohn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Sohn.m4a?v=1720614938455'},
