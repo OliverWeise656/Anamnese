@@ -44,11 +44,12 @@
 
     <div id="hearing-test" style="display: none;">
         <h1>Hörtest</h1>
-        <p>Bitte geben Sie an, ob Sie den Ton hören:</p>
-        <button id="rightTestButton" onclick="startTest('right')">Rechtes Ohr testen</button>
-        <button id="leftTestButton" onclick="startTest('left')">Linkes Ohr testen</button>
+        <p>Drücken Sie den Knopf, sobald Sie den Ton hören:</p>
+        <div id="instructions">
+            <button onclick="startTest('right')">Rechtes Ohr testen</button>
+            <button id="leftTestButton" class="hidden" onclick="startTest('left')">Linkes Ohr testen</button>
+        </div>
         <div id="test" class="hidden">
-            <p>Der Test läuft, bitte warten...</p>
             <button onclick="heardTone()">Ton gehört</button>
         </div>
         <div id="results" class="hidden">
@@ -57,8 +58,8 @@
                 <thead>
                     <tr>
                         <th>Frequenz (Hz)</th>
-                        <th>Rechtes Ohr (dB)</th>
-                        <th>Linkes Ohr (dB)</th>
+                        <th>Rechts (dB)</th>
+                        <th>Links (dB)</th>
                     </tr>
                 </thead>
                 <tbody id="resultsTableBody"></tbody>
@@ -68,7 +69,6 @@
     </div>
 
     <p id="final-result" style="display: none;"></p>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
