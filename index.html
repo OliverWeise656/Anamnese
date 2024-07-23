@@ -7,66 +7,68 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="chatbot">
-        <h1>Anamnese - Tragen Sie zunächst das Alter des Patienten ein.</h1>
-        <div id="messages"></div>
-        <input type="text" id="userInput" placeholder="Ihre Nachricht...">
-        <button id="sendButton" onclick="sendMessage()">Senden</button>
-    </div>
-
-    <div id="tone-setting" style="display: none;">
-        <h1>Ton-Einstellung</h1>
-        <p>Nach dem Drücken von "Start" hören Sie einen Ton, stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass Sie den Ton gerade noch hören können. Wenn Sie fertig sind, drücken Sie "Stopp".</p>
-        <button id="startButton">Start</button>
-        <button id="stopButton" disabled>Stopp</button>
-    </div>
-
-    <div id="initial-test" style="display: none;">
-        <h1>Sprachverständnis-Test</h1>
-        <p>Sie hören nun einzelne Worte. Tragen sie diese in das vorgesehene Feld ein.</p>
-        <button id="start-button" onclick="startInitialTest()">Test starten</button>
-        <div id="test-area" style="display: none;">
-            <p id="audio-instruction"></p>
-            <input type="text" id="answer-input">
-            <button id="submit-button">Bestätigen</button>
+    <div class="container">
+        <div id="chatbot" class="card">
+            <h1>Anamnese - Tragen Sie zunächst das Alter des Patienten ein.</h1>
+            <div id="messages"></div>
+            <input type="text" id="userInput" placeholder="Ihre Nachricht...">
+            <button id="sendButton" onclick="sendMessage()">Senden</button>
         </div>
-        <p id="result" style="display: none;"></p>
-    </div>
 
-    <div id="test" style="display: none;">
-        <h1>Sprachverständnis im Störschall</h1>
-        <p>Nun hören Sie Worte im Störlärm. Geben Sie das gehörte Wort in das vorgesehene Feld ein:</p>
-        <audio id="audioPlayer"></audio>
-        <input type="text" id="response" placeholder="Geben Sie das Wort ein">
-        <button id="nextButton">Weiter</button>
-    </div>
-
-    <p id="final-result" style="display: none;"></p>
-
-    <div id="tone-test" style="display:none;">
-        <h1>Hörtest</h1>
-        <div id="instructions">
-            <p>Willkommen zum Hörtest. Drücken Sie den Start-Button, um zu beginnen.</p>
-            <button onclick="startTest('right')">Test für das rechte Ohr starten</button>
+        <div id="tone-setting" class="card" style="display: none;">
+            <h1>Ton-Einstellung</h1>
+            <p>Nach dem Drücken von "Start" hören Sie einen Ton, stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass Sie den Ton gerade noch hören können. Wenn Sie fertig sind, drücken Sie "Stopp".</p>
+            <button id="startButton">Start</button>
+            <button id="stopButton" disabled>Stopp</button>
         </div>
-        <div id="test" style="display:none;">
-            <p>Drücken Sie den Knopf, wenn Sie den Ton hören.</p>
-            <button id="heardButton" onclick="heardTone()">Ton gehört</button>
+
+        <div id="initial-test" class="card" style="display: none;">
+            <h1>Sprachverständnis-Test</h1>
+            <p>Sie hören nun einzelne Worte. Tragen sie diese in das vorgesehene Feld ein.</p>
+            <button id="start-button" onclick="startTest()">Test starten</button>
+            <div id="test-area" style="display: none;">
+                <p id="audio-instruction"></p>
+                <input type="text" id="answer-input">
+                <button id="submit-button">Bestätigen</button>
+            </div>
+            <p id="result" style="display: none;"></p>
         </div>
-        <div id="results" style="display:none;">
-            <h2>Testergebnisse</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Frequenz (Hz)</th>
-                        <th>Rechts (dB)</th>
-                        <th>Links (dB)</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsTableBody"></tbody>
-            </table>
-            <button onclick="startTest('left')" id="leftTestButton" style="display:none;">Test für das linke Ohr starten</button>
-            <canvas id="resultsChart" width="400" height="200" style="display:none;"></canvas>
+
+        <div id="test" class="card" style="display: none;">
+            <h1>Sprachverständnis im Störschall</h1>
+            <p>Nun hören Sie Worte im Störlärm. Geben Sie das gehörte Wort in das vorgesehene Feld ein:</p>
+            <audio id="audioPlayer"></audio>
+            <input type="text" id="response" placeholder="Geben Sie das Wort ein">
+            <button id="nextButton">Weiter</button>
+        </div>
+
+        <p id="final-result" class="card" style="display: none;"></p>
+
+        <div id="tone-test" class="card" style="display:none;">
+            <h1>Hörtest</h1>
+            <div id="instructions">
+                <p>Willkommen zum Hörtest. Drücken Sie den Start-Button, um zu beginnen.</p>
+                <button onclick="startTest('right')">Test für das rechte Ohr starten</button>
+            </div>
+            <div id="test" style="display:none;">
+                <p>Drücken Sie den Knopf, wenn Sie den Ton hören.</p>
+                <button id="heardButton" onclick="heardTone()">Ton gehört</button>
+            </div>
+            <div id="results" style="display:none;">
+                <h2>Testergebnisse</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Frequenz (Hz)</th>
+                            <th>Rechts (dB)</th>
+                            <th>Links (dB)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody"></tbody>
+                </table>
+                <button onclick="startTest('left')" id="leftTestButton" style="display:none;">Test für das linke Ohr starten</button>
+                <canvas id="resultsChart" width="400" height="200" style="display:none;"></canvas>
+            </div>
         </div>
     </div>
 
