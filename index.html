@@ -2,46 +2,21 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HNO-Anamnese und Hörtest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Hörtest Chatbot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div id="chatbot">
-        <h1>Anamnese - Tragen Sie zunächst das Alter des Patienten ein.</h1>
         <div id="messages"></div>
         <input type="text" id="userInput" placeholder="Ihre Nachricht...">
-        <button id="sendButton" onclick="sendMessage()">Senden</button>
+        <button onclick="sendMessage()">Senden</button>
     </div>
 
-    <div id="tone-setting" style="display: none;">
-        <h1>Ton-Einstellung</h1>
-        <p>Nach dem Drücken von "Start" hören Sie einen Ton, stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass Sie den Ton gerade noch hören können. Wenn Sie fertig sind, drücken Sie "Stopp".</p>
-        <button id="startButton">Start</button>
-        <button id="stopButton" disabled>Stopp</button>
+    <div id="tone-setting" style="display:none;">
+        <h1>Lautstärkeeinstellung</h1>
+        <button id="startButton">Ton starten</button>
+        <button id="stopButton">Ton stoppen</button>
     </div>
-
-    <div id="initial-test" style="display: none;">
-        <h1>Sprachverständnis-Test</h1>
-        <p>Sie hören nun einzelne Worte. Tragen sie diese in das vorgesehene Feld ein.</p>
-        <button id="start-button" onclick="startTest()">Test starten</button>
-        <div id="test-area" style="display: none;">
-            <p id="audio-instruction"></p>
-            <input type="text" id="answer-input">
-            <button id="submit-button">Bestätigen</button>
-        </div>
-        <p id="result" style="display: none;"></p>
-    </div>
-
-    <div id="test" style="display: none;">
-        <h1>Sprachverständnis im Störschall</h1>
-        <p>Nun hören Sie Worte im Störlärm. Geben Sie das gehörte Wort in das vorgesehene Feld ein:</p>
-        <audio id="audioPlayer"></audio>
-        <input type="text" id="response" placeholder="Geben Sie das Wort ein">
-        <button id="nextButton">Weiter</button>
-    </div>
-
-    <p id="final-result" style="display: none;"></p>
 
     <div id="tone-test" style="display:none;">
         <h1>Hörtest</h1>
@@ -70,7 +45,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
