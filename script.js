@@ -848,6 +848,21 @@ function saveResultsAsPDF() {
   html2canvas(document.getElementById('resultsChart')).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
+
+    // Add the conversation to the PDF
+    yPosition += 110;
+    doc.text('Chatbot Konversation:', 10, yPosition);
+    yPosition += 10;
+    conversation.forEach((msg, index) => {
+      const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
+      doc.text(text, 10, yPosition);
+      yPosition += 10;
+      if (yPosition > 280) { // Add new page if the content is too long
+        doc.addPage();
+        yPosition = 10;
+      }
+    });
+
     doc.save('Anamnese_und_Testergebnisse.pdf');
   });
 }
