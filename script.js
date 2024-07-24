@@ -35,7 +35,9 @@ let state = {
     weightLossAmount: null,
     urgency: 'normal',
     hearingTestRecommended: false,
-    voiceAnalysisRecommended: false
+    voiceAnalysisRecommended: false,
+    initialTestScore: 0,
+    hearingTestScore: 0
 };
 
 async function sendMessage() {
@@ -507,7 +509,6 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
 const selectedWords = [];
 const numWords = 20;
 let currentWordIndex = 0;
-let score = 0;
 
 // Shuffle array and select first 20 unique words
 while (selectedWords.length < numWords) {
@@ -539,7 +540,7 @@ function checkAnswer() {
     const userAnswer = document.getElementById('answer-input').value.trim().toLowerCase();
     const correctAnswer = selectedWords[currentWordIndex];
     if (userAnswer === correctAnswer) {
-        score++;
+        state.initialTestScore++;
     }
     currentWordIndex++;
     document.getElementById('answer-input').value = '';
@@ -553,7 +554,7 @@ function checkAnswer() {
 function showInitialResult() {
     document.getElementById('test-area').style.display = 'none';
     document.getElementById('initial-test-result').style.display = 'block';
-    document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + score + ' von ' + numWords;
+    document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
     setTimeout(startHearingTest, 3000);
 }
 
@@ -602,7 +603,7 @@ document.getElementById('nextButton').addEventListener('click', nextHearingWord)
 function nextHearingWord() {
   const response = document.getElementById('response').value.trim();
   if (response.toLowerCase() === testWords[currentHearingWordIndex].name.toLowerCase()) {
-    score++;
+    state.hearingTestScore++;
   }
   document.getElementById('response').value = '';
   currentHearingWordIndex++;
@@ -616,7 +617,7 @@ function nextHearingWord() {
 function showFinalResult() {
   document.getElementById('test').style.display = 'none';
   document.getElementById('final-result').style.display = 'block';
-  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + score + ' von ' + (numWords + testWords.length);
+  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
   setTimeout(() => {
     document.getElementById('final-result').style.display = 'none';
     startHearingTestProcess();
@@ -838,5 +839,15 @@ function saveResultsAsPDF() {
     yPosition += 10;
   });
 
-  doc.save('Anamnese_und_Testergebnisse.pdf');
+  doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
+  yPosition += 10;
+  doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
+  yPosition += 20;
+
+  // Add the chart as an image to the PDF
+  html2canvas(document.getElementById('resultsChart')).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
+    doc.save('Anamnese_und_Testergebnisse.pdf');
+  });
 }
