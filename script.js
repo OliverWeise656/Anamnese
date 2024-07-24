@@ -780,6 +780,12 @@ function renderChart() {
   document.getElementById('resultsChart').classList.remove('hidden');
 }
 
+function confirmSavePdf() {
+    if (confirm('Möchten Sie die Ergebnisse als PDF speichern?')) {
+        saveResultsAsPDF();
+    }
+}
+
 function saveResultsAsPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -844,12 +850,11 @@ function saveResultsAsPDF() {
   doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
   yPosition += 20;
 
-  // Add the chart as an image to the PDF
-  html2canvas(document.getElementById('resultsChart')).then(canvas => {
+  const canvas = document.getElementById('resultsChart');
+  html2canvas(canvas).then((canvas) => {
     const imgData = canvas.toDataURL('image/png');
     doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
-    
-    // Add the conversation to the PDF
+
     yPosition += 110;
     doc.text('Chatbot Konversation:', 10, yPosition);
     yPosition += 10;
@@ -857,14 +862,14 @@ function saveResultsAsPDF() {
       const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
       doc.text(text, 10, yPosition);
       yPosition += 10;
-      if (yPosition > 280) { // Add new page if the content is too long
+      if (yPosition > 280) {
         doc.addPage();
         yPosition = 10;
       }
     });
 
     doc.save('Anamnese_und_Testergebnisse.pdf');
-  }).catch(error => {
+  }).catch((error) => {
     console.error('Error capturing chart with html2canvas:', error);
   });
 }
