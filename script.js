@@ -848,7 +848,7 @@ function saveResultsAsPDF() {
   html2canvas(document.getElementById('resultsChart')).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
-
+    
     // Add the conversation to the PDF
     yPosition += 110;
     doc.text('Chatbot Konversation:', 10, yPosition);
@@ -864,5 +864,7 @@ function saveResultsAsPDF() {
     });
 
     doc.save('Anamnese_und_Testergebnisse.pdf');
+  }).catch(error => {
+    console.error('Error capturing chart with html2canvas:', error);
   });
 }
