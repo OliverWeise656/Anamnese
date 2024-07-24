@@ -873,13 +873,3 @@ function saveResultsAsPDF() {
     console.error('Error capturing chart with html2canvas:', error);
   });
 }
- // Redirect after saving the PDF if the patient is between 6 and 17 years old
-    if (state.age >= 6 && state.age <= 17) {
-      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-    } else if (state.voiceAnalysisRecommended) { // Assuming state.voiceAnalysisRecommended is set if a voice analysis is recommended
-      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-    }
-  }).catch((error) => {
-    console.error('Error capturing chart with html2canvas:', error);
-  });
-}
