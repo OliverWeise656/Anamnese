@@ -44,8 +44,10 @@
 
     <div id="hearing-test" style="display: none;">
         <h1>Hörtest</h1>
-        <p id="instructions">Drücken Sie den Knopf, um den Test des rechten Ohres zu starten.</p>
-        <button id="start-right-test-button" onclick="startTest('right')">Rechtes Ohr testen</button>
+        <div id="instructions">
+            <p>Drücken Sie den Knopf, um den Test des rechten Ohres zu starten.</p>
+            <button id="start-right-test-button" onclick="startTest('right')">Rechtes Ohr testen</button>
+        </div>
         <div id="right-test-done" class="hidden">
             <p>Der Test für das rechte Ohr ist abgeschlossen. Drücken Sie auf "Linkes Ohr testen", um fortzufahren.</p>
             <button id="start-left-test-button" onclick="startTest('left')">Linkes Ohr testen</button>
