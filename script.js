@@ -630,159 +630,155 @@ function startHearingTestProcess() {
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -40; // Startlautstärke auf -40 dB setzen
+let currentDb = -50; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
-let audioContext;
-let oscillator;
-let gainNode;
-let panner;
 
 function startTest(side) {
-    currentSide = side;
-    currentFrequencyIndex = 0;
-    document.getElementById('instructions').classList.add('hidden');
-    document.getElementById('right-test-done').classList.add('hidden');
-    document.getElementById('test-area').classList.remove('hidden');
-    startToneHearingTest();
+  currentSide = side;
+  currentFrequencyIndex = 0;
+  document.getElementById('instructions').classList.add('hidden');
+  document.getElementById('right-test-done').classList.add('hidden');
+  document.getElementById('test-area').classList.remove('hidden');
+  startToneHearingTest();
 }
 
 function startToneHearingTest() {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    oscillator = audioContext.createOscillator();
-    gainNode = audioContext.createGain();
-    panner = audioContext.createStereoPanner();
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  oscillator = audioContext.createOscillator();
+  gainNode = audioContext.createGain();
+  panner = audioContext.createStereoPanner();
 
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
-    gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
+  gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
 
-    // Set the panner to the appropriate side
-    panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
+  // Set the panner to the appropriate side
+  panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
-    oscillator.connect(gainNode);
-    gainNode.connect(panner);
-    panner.connect(audioContext.destination);
+  oscillator.connect(gainNode);
+  gainNode.connect(panner);
+  panner.connect(audioContext.destination);
 
-    oscillator.start();
+  oscillator.start();
 
-    increaseVolume();
+  increaseVolume();
 }
 
 function increaseVolume() {
-    currentDb = -40; // Startlautstärke auf -40 dB setzen
-    let increaseInterval = setInterval(() => {
-        if (currentDb < 90) {
-            currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
-            gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
-        } else {
-            clearInterval(increaseInterval);
-        }
-    }, 1000); // Erhöhungsintervall auf 1 Sekunde setzen
+  currentDb = -50; // Startlautstärke auf -40 dB setzen
+  let increaseInterval = setInterval(() => {
+    if (currentDb < 90) {
+      currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
+      gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
+    } else {
+      clearInterval(increaseInterval);
+    }
+  }, 1000);  // Erhöhungsintervall auf 1 Sekunde setzen
 }
 
 function heardTone() {
-    results[currentSide][frequencies[currentFrequencyIndex]] = currentDb;
-    stopToneHearingTest();
+  results[currentSide][frequencies[currentFrequencyIndex]] = currentDb;
+  stopToneHearingTest();
 
-    if (currentFrequencyIndex < frequencies.length - 1) {
-        currentFrequencyIndex++;
-        setTimeout(startToneHearingTest, Math.random() * (1000 - 250) + 250);
+  if (currentFrequencyIndex < frequencies.length - 1) {
+    currentFrequencyIndex++;
+    setTimeout(startToneHearingTest, Math.random() * (3000 - 250) + 250);
+  } else {
+    if (currentSide === 'right') {
+      document.getElementById('test-area').classList.add('hidden');
+      document.getElementById('right-test-done').classList.remove('hidden');
     } else {
-        document.getElementById('test-area').classList.add('hidden');
-        if (currentSide === 'right') {
-            document.getElementById('right-test-done').classList.remove('hidden');
-        } else {
-            displayResults();
-            renderChart();
-            saveResultsAsPDF();
-        }
+      document.getElementById('test-area').classList.add('hidden');
+      displayResults();
+      renderChart();
+      saveResultsAsPDF();
     }
+  }
 }
 
 function stopToneHearingTest() {
-    oscillator.stop();
-    oscillator.disconnect();
-    gainNode.disconnect();
-    audioContext.close();
+  oscillator.stop();
+  oscillator.disconnect();
+  gainNode.disconnect();
+  audioContext.close();
 }
 
 function displayResults() {
-    let tableBody = document.getElementById('resultsTableBody');
-    tableBody.innerHTML = '';
+  let tableBody = document.getElementById('resultsTableBody');
+  tableBody.innerHTML = '';
 
-    frequencies.forEach(freq => {
-        let row = document.createElement('tr');
-        let freqCell = document.createElement('td');
-        let rightCell = document.createElement('td');
-        let leftCell = document.createElement('td');
+  frequencies.forEach(freq => {
+    let row = document.createElement('tr');
+    let freqCell = document.createElement('td');
+    let rightCell = document.createElement('td');
+    let leftCell = document.createElement('td');
 
-        freqCell.textContent = freq;
-        rightCell.textContent = results.right[freq] || 'N/A';
-        leftCell.textContent = results.left[freq] || 'N/A';
+    freqCell.textContent = freq;
+    rightCell.textContent = results.right[freq] || 'N/A';
+    leftCell.textContent = results.left[freq] || 'N/A';
 
-        row.appendChild(freqCell);
-        row.appendChild(rightCell);
-        row.appendChild(leftCell);
-        tableBody.appendChild(row);
-    });
+    row.appendChild(freqCell);
+    row.appendChild(rightCell);
+    row.appendChild(leftCell);
+    tableBody.appendChild(row);
+  });
 
-    document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').classList.remove('hidden');
 }
 
 function renderChart() {
-    const ctx = document.getElementById('resultsChart').getContext('2d');
-    const rightData = frequencies.map(freq => -results.right[freq] || -90);
-    const leftData = frequencies.map(freq => -results.left[freq] || -90);
+  const ctx = document.getElementById('resultsChart').getContext('2d');
+  const rightData = frequencies.map(freq => -results.right[freq] || -90);
+  const leftData = frequencies.map(freq => -results.left[freq] || -90);
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: frequencies,
-            datasets: [
-                {
-                    label: 'Rechts',
-                    data: rightData,
-                    borderColor: 'red',
-                    fill: false,
-                    tension: 0.1
-                },
-                {
-                    label: 'Links',
-                    data: leftData,
-                    borderColor: 'blue',
-                    fill: false,
-                    tension: 0.1
-                }
-            ]
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: frequencies,
+      datasets: [
+        {
+          label: 'Rechts',
+          data: rightData,
+          borderColor: 'red',
+          fill: false,
+          tension: 0.1
         },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value + ' dB';
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Hörschwelle (dB)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Frequenz (Hz)'
-                    }
-                }
-            }
+        {
+          label: 'Links',
+          data: leftData,
+          borderColor: 'blue',
+          fill: false,
+          tension: 0.1
         }
-    });
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value + ' dB';
+            }
+          },
+          title: {
+            display: true,
+            text: 'Hörschwelle (dB)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Frequenz (Hz)'
+          }
+        }
+      }
+    }
+  });
 
-    document.getElementById('resultsChart').classList.remove('hidden');
+  document.getElementById('resultsChart').classList.remove('hidden');
 }
-
 
 function confirmSavePdf() {
     if (confirm('Möchten Sie die Ergebnisse als PDF speichern?')) {
@@ -875,12 +871,12 @@ function saveResultsAsPDF() {
     doc.save('Anamnese_und_Testergebnisse.pdf');
  
  // Redirect after saving the PDF if the patient is between 6 and 17 years old
-        if (state.age >= 6 && state.age <= 17) {
-            window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-        } else if (state.voiceAnalysisRecommended) { // Assuming state.voiceAnalysisRecommended is set if a voice analysis is recommended
-            window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-        }
-    }).catch((error) => {
-        console.error('Error capturing chart with html2canvas:', error);
-    });
+    if (state.age >= 6 && state.age <= 17) {
+      window.location.href = ' https://sulky-equal-cinnamon.glitch.me';
+    } else if (state.voiceAnalysisRecommended) { // Assuming state.voiceAnalysisRecommended is set if a voice analysis is recommended
+      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+    }
+  }).catch((error) => {
+    console.error('Error capturing chart with html2canvas:', error);
+  });
 }
