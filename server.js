@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const fs = require('fs');
@@ -8,42 +7,41 @@ const path = require('path');
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'your-email@gmail.com',
+        pass: 'your-email-password'
+    }
+});
+
 app.post('/send-email', upload.single('pdf'), (req, res) => {
-    const { email } = req.body;
     const pdfPath = req.file.path;
-    const pdfFilename = req.file.originalname;
 
-    let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'youremail@gmail.com',
-            pass: 'yourpassword'
-        }
-    });
-
-    let mailOptions = {
-        from: 'youremail@gmail.com',
-        to: email,
+    const mailOptions = {
+        from: 'your-email@gmail.com',
+        to: 'weise@hno-stuttgart.com',
         subject: 'Anamnese und Testergebnisse',
-        text: 'Anbei finden Sie die Anamnese und Testergebnisse.',
+        text: 'Im Anhang finden Sie die Anamnese und die Testergebnisse.',
         attachments: [
             {
-                filename: pdfFilename,
+                filename: 'Anamnese_und_Testergebnisse.pdf',
                 path: pdfPath
             }
         ]
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
+        fs.unlinkSync(pdfPath); // Delete the file after sending
         if (error) {
-            return res.status(500).send(error.toString());
+            console.error('Error:', error);
+            res.json({ success: false });
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.json({ success: true });
         }
-        fs.unlinkSync(pdfPath); // Delete the file after sending it
-        res.status(200).send('Email sent: ' + info.response);
     });
 });
 
