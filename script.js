@@ -507,7 +507,7 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
                "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
                "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
 const selectedWords = [];
-const numWords = 10;
+const numWords = 20;
 let currentWordIndex = 0;
 let initialVolume = 1.0; // Start volume at 100%
 const volumeDecrement = 0.1; // Decrease volume by 10% each step
@@ -634,7 +634,7 @@ function startHearingTestProcess() {
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -60; // Startlautstärke auf -40 dB setzen
+let currentDb = -40; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
 
@@ -670,7 +670,7 @@ function startToneHearingTest() {
 }
 
 function increaseVolume() {
-  currentDb = -60; // Startlautstärke auf -40 dB setzen
+  currentDb = -40; // Startlautstärke auf -40 dB setzen
   let increaseInterval = setInterval(() => {
     if (currentDb < 90) {
       currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
@@ -687,7 +687,7 @@ function heardTone() {
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startToneHearingTest, Math.random() * (5000 - 250) + 250);
+    setTimeout(startToneHearingTest, Math.random() * (1000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
       document.getElementById('test-area').classList.add('hidden');
