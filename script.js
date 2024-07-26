@@ -507,7 +507,7 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
                "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
                "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
 const selectedWords = [];
-const numWords = 10;
+const numWords = 20;
 let currentWordIndex = 0;
 let initialVolume = 1.0; // Start volume at 100%
 const volumeDecrement = 0.1; // Decrease volume by 10% each step
