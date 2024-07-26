@@ -628,156 +628,186 @@ function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
 }
 
+let audioContext;
+let oscillator;
+let gainNode;
+let panner;
+
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -50; // Startlautstärke auf -40 dB setzen
+let currentDb = -40; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
+let state = {
+    age: null,
+    reason: '',
+    painDuration: '',
+    painIntensity: '',
+    dizzinessDuration: '',
+    dizzinessIntensity: '',
+    tinnitusDuration: '',
+    tinnitusEar: '',
+    tinnitusIntensity: '',
+    hearingLossDuration: '',
+    hearingLossEar: '',
+    hearingLossIntensity: '',
+    weightLoss: null,
+    weightLossAmount: '',
+    initialTestScore: 0,
+    hearingTestScore: 0,
+    voiceAnalysisRecommended: false
+};
+let conversation = [];
+
+// Initial setup and functions for the chatbot and hearing test
 
 function startTest(side) {
-  currentSide = side;
-  currentFrequencyIndex = 0;
-  document.getElementById('instructions').classList.add('hidden');
-  document.getElementById('right-test-done').classList.add('hidden');
-  document.getElementById('test-area').classList.remove('hidden');
-  startToneHearingTest();
+    currentSide = side;
+    currentFrequencyIndex = 0;
+    currentDb = -40; // Reset the starting volume for each ear
+
+    document.getElementById('instructions').classList.add('hidden');
+    document.getElementById('right-test-done').classList.add('hidden');
+    document.getElementById('start-right-test-button').classList.add('hidden');
+    document.getElementById('start-left-test-button').classList.add('hidden');
+    document.getElementById('test-area').classList.remove('hidden');
+
+    startToneHearingTest();
 }
 
 function startToneHearingTest() {
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  oscillator = audioContext.createOscillator();
-  gainNode = audioContext.createGain();
-  panner = audioContext.createStereoPanner();
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    oscillator = audioContext.createOscillator();
+    gainNode = audioContext.createGain();
+    panner = audioContext.createStereoPanner();
 
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
-  gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
+    gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
 
-  // Set the panner to the appropriate side
-  panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
+    // Set the panner to the appropriate side
+    panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
-  oscillator.connect(gainNode);
-  gainNode.connect(panner);
-  panner.connect(audioContext.destination);
+    oscillator.connect(gainNode);
+    gainNode.connect(panner);
+    panner.connect(audioContext.destination);
 
-  oscillator.start();
+    oscillator.start();
 
-  increaseVolume();
+    increaseVolume();
 }
 
 function increaseVolume() {
-  currentDb = -50; // Startlautstärke auf -40 dB setzen
-  let increaseInterval = setInterval(() => {
-    if (currentDb < 90) {
-      currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
-      gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
-    } else {
-      clearInterval(increaseInterval);
-    }
-  }, 1000);  // Erhöhungsintervall auf 1 Sekunde setzen
+    currentDb = -40; // Startlautstärke auf -40 dB setzen
+    let increaseInterval = setInterval(() => {
+        if (currentDb < 90) {
+            currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
+            gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
+        } else {
+            clearInterval(increaseInterval);
+        }
+    }, 1000);  // Erhöhungsintervall auf 1 Sekunde setzen
 }
 
 function heardTone() {
-  results[currentSide][frequencies[currentFrequencyIndex]] = currentDb;
-  stopToneHearingTest();
+    results[currentSide][frequencies[currentFrequencyIndex]] = currentDb;
+    stopToneHearingTest();
 
-  if (currentFrequencyIndex < frequencies.length - 1) {
-    currentFrequencyIndex++;
-    setTimeout(startToneHearingTest, Math.random() * (3000 - 250) + 250);
-  } else {
-    if (currentSide === 'right') {
-      document.getElementById('test-area').classList.add('hidden');
-      document.getElementById('right-test-done').classList.remove('hidden');
+    if (currentFrequencyIndex < frequencies.length - 1) {
+        currentFrequencyIndex++;
+        setTimeout(startToneHearingTest, Math.random() * (1000 - 250) + 250);
     } else {
-      document.getElementById('test-area').classList.add('hidden');
-      displayResults();
-      renderChart();
-      saveResultsAsPDF();
+        if (currentSide === 'right') {
+            document.getElementById('test-area').classList.add('hidden');
+            document.getElementById('right-test-done').classList.remove('hidden');
+        } else {
+            document.getElementById('test-area').classList.add('hidden');
+            displayResults();
+            renderChart();
+            confirmSendEmail();
+        }
     }
-  }
 }
 
 function stopToneHearingTest() {
-  oscillator.stop();
-  oscillator.disconnect();
-  gainNode.disconnect();
-  audioContext.close();
+    oscillator.stop();
+    audioContext.close();
 }
 
 function displayResults() {
-  let tableBody = document.getElementById('resultsTableBody');
-  tableBody.innerHTML = '';
+    let tableBody = document.getElementById('resultsTableBody');
+    tableBody.innerHTML = '';
 
-  frequencies.forEach(freq => {
-    let row = document.createElement('tr');
-    let freqCell = document.createElement('td');
-    let rightCell = document.createElement('td');
-    let leftCell = document.createElement('td');
+    frequencies.forEach(freq => {
+        let row = document.createElement('tr');
+        let freqCell = document.createElement('td');
+        let rightCell = document.createElement('td');
+        let leftCell = document.createElement('td');
 
-    freqCell.textContent = freq;
-    rightCell.textContent = results.right[freq] || 'N/A';
-    leftCell.textContent = results.left[freq] || 'N/A';
+        freqCell.textContent = freq;
+        rightCell.textContent = results.right[freq] || 'N/A';
+        leftCell.textContent = results.left[freq] || 'N/A';
 
-    row.appendChild(freqCell);
-    row.appendChild(rightCell);
-    row.appendChild(leftCell);
-    tableBody.appendChild(row);
-  });
+        row.appendChild(freqCell);
+        row.appendChild(rightCell);
+        row.appendChild(leftCell);
+        tableBody.appendChild(row);
+    });
 
-  document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').classList.remove('hidden');
 }
 
 function renderChart() {
-  const ctx = document.getElementById('resultsChart').getContext('2d');
-  const rightData = frequencies.map(freq => -results.right[freq] || -90);
-  const leftData = frequencies.map(freq => -results.left[freq] || -90);
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    const rightData = frequencies.map(freq => -results.right[freq] || -90);
+    const leftData = frequencies.map(freq => -results.left[freq] || -90);
 
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: frequencies,
-      datasets: [
-        {
-          label: 'Rechts',
-          data: rightData,
-          borderColor: 'red',
-          fill: false,
-          tension: 0.1
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: frequencies,
+            datasets: [
+                {
+                    label: 'Rechts',
+                    data: rightData,
+                    borderColor: 'red',
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Links',
+                    data: leftData,
+                    borderColor: 'blue',
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
         },
-        {
-          label: 'Links',
-          data: leftData,
-          borderColor: 'blue',
-          fill: false,
-          tension: 0.1
-        }
-      ]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return value + ' dB';
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' dB';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Hörschwelle (dB)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Frequenz (Hz)'
+                    }
+                }
             }
-          },
-          title: {
-            display: true,
-            text: 'Hörschwelle (dB)'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Frequenz (Hz)'
-          }
         }
-      }
-    }
-  });
+    });
 
-  document.getElementById('resultsChart').classList.remove('hidden');
+    document.getElementById('resultsChart').classList.remove('hidden');
 }
 
 function confirmSavePdf() {
@@ -786,89 +816,130 @@ function confirmSavePdf() {
     }
 }
 
-function saveResultsAsPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.text('Anamnese und Testergebnisse', 10, 10);
-  doc.text('Alter des Patienten: ' + state.age, 10, 20);
-  doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
-
-  let yPosition = 40;
-
-  if (state.painDuration) {
-    doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Schmerzintensität: ' + state.painIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.dizzinessDuration) {
-    doc.text('Schwindel seit: ' + state.dizzinessDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Schwindelintensität: ' + state.dizzinessIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.tinnitusDuration) {
-    doc.text('Ohrgeräusche/Tinnitus seit: ' + state.tinnitusDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Ohr: ' + state.tinnitusEar, 10, yPosition);
-    yPosition += 10;
-    doc.text('Tinnitusintensität: ' + state.tinnitusIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.hearingLossDuration) {
-    doc.text('Hörprobleme seit: ' + state.hearingLossDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Ohr: ' + state.hearingLossEar, 10, yPosition);
-    yPosition += 10;
-    doc.text('Hörproblemeintensität: ' + state.hearingLossIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.weightLoss !== null && state.weightLoss !== 'nein') {
-    doc.text('Unfreiwilliger Gewichtsverlust: ' + state.weightLoss, 10, yPosition);
-    yPosition += 10;
-    if (state.weightLossAmount !== null) {
-      doc.text('Details zum Gewichtsverlust: ' + state.weightLossAmount, 10, yPosition);
-      yPosition += 10;
+function confirmSendEmail() {
+    if (confirm('Möchten Sie die Ergebnisse an den behandelnden Arzt senden?')) {
+        saveResultsAsPDF(sendEmail);
     }
-  }
+}
 
-  doc.text('Testergebnisse:', 10, yPosition);
-  yPosition += 10;
+function saveResultsAsPDF(callback) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-  frequencies.forEach(freq => {
-    doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
+    doc.text('Anamnese und Testergebnisse', 10, 10);
+    doc.text('Alter des Patienten: ' + state.age, 10, 20);
+    doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
+
+    let yPosition = 40;
+
+    if (state.painDuration) {
+        doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Schmerzintensität: ' + state.painIntensity, 10, yPosition);
+        yPosition += 10;
+    }
+
+    if (state.dizzinessDuration) {
+        doc.text('Schwindel seit: ' + state.dizzinessDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Schwindelintensität: ' + state.dizzinessIntensity, 10, yPosition);
+        yPosition += 10;
+    }
+
+    if (state.tinnitusDuration) {
+        doc.text('Ohrgeräusche/Tinnitus seit: ' + state.tinnitusDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Ohr: ' + state.tinnitusEar, 10, yPosition);
+        yPosition += 10;
+        doc.text('Tinnitusintensität: ' + state.tinnitusIntensity, 10, yPosition);
+        yPosition += 10;
+    }
+
+    if (state.hearingLossDuration) {
+        doc.text('Hörprobleme seit: ' + state.hearingLossDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Ohr: ' + state.hearingLossEar, 10, yPosition);
+        yPosition += 10;
+        doc.text('Hörproblemeintensität: ' + state.hearingLossIntensity, 10, yPosition);
+        yPosition += 10;
+    }
+
+    if (state.weightLoss !== null && state.weightLoss !== 'nein') {
+        doc.text('Unfreiwilliger Gewichtsverlust: ' + state.weightLoss, 10, yPosition);
+        yPosition += 10;
+        if (state.weightLossAmount !== null) {
+            doc.text('Details zum Gewichtsverlust: ' + state.weightLossAmount, 10, yPosition);
+            yPosition += 10;
+        }
+    }
+
+    doc.text('Testergebnisse:', 10, yPosition);
     yPosition += 10;
-  });
 
-  doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
-  yPosition += 10;
-  doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
-  yPosition += 20;
-
-  const canvas = document.getElementById('resultsChart');
-  html2canvas(canvas).then((canvas) => {
-    const imgData = canvas.toDataURL('image/png');
-    doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
-
-    yPosition += 110;
-    doc.text('Chatbot Konversation:', 10, yPosition);
-    yPosition += 10;
-    conversation.forEach((msg, index) => {
-      const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
-      doc.text(text, 10, yPosition);
-      yPosition += 10;
-      if (yPosition > 280) {
-        doc.addPage();
-        yPosition = 10;
-      }
+    frequencies.forEach(freq => {
+        doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
+        yPosition += 10;
     });
 
-    doc.save('Anamnese_und_Testergebnisse.pdf');
+    doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
+    yPosition += 10;
+    doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
+    yPosition += 20;
+
+    const canvas = document.getElementById('resultsChart');
+    html2canvas(canvas).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
+
+        yPosition += 110;
+        doc.text('Chatbot Konversation:', 10, yPosition);
+        yPosition += 10;
+        conversation.forEach((msg, index) => {
+            const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
+            doc.text(text, 10, yPosition);
+            yPosition += 10;
+            if (yPosition > 280) {
+                doc.addPage();
+                yPosition = 10;
+            }
+        });
+
+        const pdfBlob = doc.output('blob');
+        if (callback) {
+            callback(pdfBlob);
+        } else {
+            alert('PDF wurde erfolgreich gespeichert.');
+        }
+
+        if (state.age >= 6 && state.age <= 17) {
+            window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+        } else if (state.voiceAnalysisRecommended) {
+            window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+        }
+    }).catch((error) => {
+        console.error('Error capturing chart with html2canvas:', error);
+    });
+}
+
+function sendEmail(pdfBlob) {
+    const formData = new FormData();
+    formData.append('pdf', pdfBlob, 'Anamnese_und_Testergebnisse.pdf');
+    formData.append('email', 'weise@hno-stuttgart.com');
+
+    fetch('/send-email', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (response.ok) {
+            alert('PDF und Audiodateien wurden erfolgreich per E-Mail versendet.');
+        } else {
+            alert('Fehler beim Senden der E-Mail.');
+        }
+    }).catch(error => {
+        console.error('Error sending email:', error);
+    });
+}
+
  
  // Redirect after saving the PDF if the patient is between 6 and 17 years old
     if (state.age >= 6 && state.age <= 17) {
