@@ -1,54 +1,50 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 const fs = require('fs');
-const path = require('path');
 
 const app = express();
+const upload = multer({ dest: 'uploads/' });
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'your-email@gmail.com',
-    pass: 'your-email-password'
-  }
-});
+app.post('/send-email', upload.single('pdf'), (req, res) => {
+    const email = req.body.email;
+    const file = req.file;
 
-app.post('/send-pdf', (req, res) => {
-  const { email, pdfBase64 } = req.body;
-
-  const pdfBuffer = Buffer.from(pdfBase64, 'base64');
-  const filePath = path.join(__dirname, 'Anamnese_und_Testergebnisse.pdf');
-
-  fs.writeFile(filePath, pdfBuffer, (err) => {
-    if (err) {
-      return res.status(500).send('Error saving PDF');
-    }
-
-    const mailOptions = {
-      from: 'your-email@gmail.com',
-      to: email,
-      subject: 'Anamnese und Testergebnisse',
-      text: 'Anbei finden Sie Ihre Anamnese und Testergebnisse.',
-      attachments: [
-        {
-          filename: 'Anamnese_und_Testergebnisse.pdf',
-          path: filePath
+    let transporter = nodemailer.createTransport({
+        service: 'protonmail', // Use the correct SMTP server for ProtonMail
+        auth: {
+            user: 'solm3@proton.me', // Your ProtonMail email
+            pass: '#Silke1969!' // Your ProtonMail password
         }
-      ]
+    });
+
+    let mailOptions = {
+        from: 'your-email@protonmail.com',
+        to: email,
+        subject: 'Anamnese und Testergebnisse',
+        text: 'Bitte finden Sie im Anhang die PDF-Datei mit den Anamnese- und Testergebnissen.',
+        attachments: [
+            {
+                filename: 'Anamnese_und_Testergebnisse.pdf',
+                path: file.path,
+                contentType: 'application/pdf'
+            }
+        ]
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        return res.status(500).send('Error sending email');
-      }
-      res.send('Email sent: ' + info.response);
+        if (error) {
+            return res.status(500).send(error.toString());
+        }
+        res.status(200).send('Email sent: ' + info.response);
+        fs.unlinkSync(file.path); // Delete the file after sending the email
     });
-  });
 });
 
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+    console.log('Server started on port 3000');
 });
