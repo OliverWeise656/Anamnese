@@ -1,51 +1,54 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
-const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
-
-app.use(express.static('public'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'your-email@gmail.com',
-        pass: 'your-email-password'
-    }
+  service: 'gmail',
+  auth: {
+    user: 'your-email@gmail.com',
+    pass: 'your-email-password'
+  }
 });
 
-app.post('/send-email', upload.single('pdf'), (req, res) => {
-    const pdfPath = req.file.path;
+app.post('/send-pdf', (req, res) => {
+  const { email, pdfBase64 } = req.body;
+
+  const pdfBuffer = Buffer.from(pdfBase64, 'base64');
+  const filePath = path.join(__dirname, 'Anamnese_und_Testergebnisse.pdf');
+
+  fs.writeFile(filePath, pdfBuffer, (err) => {
+    if (err) {
+      return res.status(500).send('Error saving PDF');
+    }
 
     const mailOptions = {
-        from: 'your-email@gmail.com',
-        to: 'weise@hno-stuttgart.com',
-        subject: 'Anamnese und Testergebnisse',
-        text: 'Im Anhang finden Sie die Anamnese und die Testergebnisse.',
-        attachments: [
-            {
-                filename: 'Anamnese_und_Testergebnisse.pdf',
-                path: pdfPath
-            }
-        ]
+      from: 'your-email@gmail.com',
+      to: email,
+      subject: 'Anamnese und Testergebnisse',
+      text: 'Anbei finden Sie Ihre Anamnese und Testergebnisse.',
+      attachments: [
+        {
+          filename: 'Anamnese_und_Testergebnisse.pdf',
+          path: filePath
+        }
+      ]
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
-        fs.unlinkSync(pdfPath); // Delete the file after sending
-        if (error) {
-            console.error('Error:', error);
-            res.json({ success: false });
-        } else {
-            console.log('Email sent: ' + info.response);
-            res.json({ success: true });
-        }
+      if (error) {
+        return res.status(500).send('Error sending email');
+      }
+      res.send('Email sent: ' + info.response);
     });
+  });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
 });
