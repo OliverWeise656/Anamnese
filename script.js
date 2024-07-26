@@ -507,7 +507,7 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
                "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
                "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
 const selectedWords = [];
-const numWords = 5;
+const numWords = 20;
 let currentWordIndex = 0;
 
 // Shuffle array and select first 20 unique words
@@ -630,7 +630,7 @@ function startHearingTestProcess() {
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -50; // Startlautstärke auf -40 dB setzen
+let currentDb = -40; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
 
@@ -666,7 +666,7 @@ function startToneHearingTest() {
 }
 
 function increaseVolume() {
-  currentDb = -50; // Startlautstärke auf -40 dB setzen
+  currentDb = -40; // Startlautstärke auf -40 dB setzen
   let increaseInterval = setInterval(() => {
     if (currentDb < 90) {
       currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
@@ -683,7 +683,7 @@ function heardTone() {
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startToneHearingTest, Math.random() * (3000 - 250) + 250);
+    setTimeout(startToneHearingTest, Math.random() * (1000 - 250) + 250);
   } else {
     if (currentSide === 'right') {
       document.getElementById('test-area').classList.add('hidden');
@@ -780,15 +780,16 @@ function renderChart() {
   document.getElementById('resultsChart').classList.remove('hidden');
 }
 
-function confirmSavePdf() {
-    if (confirm('Möchten Sie die Ergebnisse als PDF speichern?')) {
-        saveResultsAsPDF();
-    }
-}
-
 function saveResultsAsPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  const date = new Date().toISOString().split('T')[0];
+  const folderName = `${date}_HNO_Test`;
+  const fs = require('fs');
+
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName);
+  }
 
   doc.text('Anamnese und Testergebnisse', 10, 10);
   doc.text('Alter des Patienten: ' + state.age, 10, 20);
@@ -850,11 +851,12 @@ function saveResultsAsPDF() {
   doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
   yPosition += 20;
 
-  const canvas = document.getElementById('resultsChart');
-  html2canvas(canvas).then((canvas) => {
+  // Add the chart as an image to the PDF
+  html2canvas(document.getElementById('resultsChart')).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
 
+    // Add the conversation to the PDF
     yPosition += 110;
     doc.text('Chatbot Konversation:', 10, yPosition);
     yPosition += 10;
@@ -862,21 +864,14 @@ function saveResultsAsPDF() {
       const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
       doc.text(text, 10, yPosition);
       yPosition += 10;
-      if (yPosition > 280) {
+      if (yPosition > 280) { // Add new page if the content is too long
         doc.addPage();
         yPosition = 10;
       }
     });
 
-    doc.save('Anamnese_und_Testergebnisse.pdf');
- 
- // Redirect after saving the PDF if the patient is between 6 and 17 years old
-    if (state.age >= 6 && state.age <= 17) {
-      window.location.href = ' https://sulky-equal-cinnamon.glitch.me';
-    } else if (state.voiceAnalysisRecommended) { // Assuming state.voiceAnalysisRecommended is set if a voice analysis is recommended
-      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-    }
-  }).catch((error) => {
-    console.error('Error capturing chart with html2canvas:', error);
+    const filePath = `${folderName}/Anamnese_und_Testergebnisse.pdf`;
+    doc.save(filePath);
+    alert(`PDF gespeichert in: ${filePath}`);
   });
 }
