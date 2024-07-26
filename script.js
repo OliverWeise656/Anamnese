@@ -507,8 +507,10 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
                "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
                "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
 const selectedWords = [];
-const numWords = 20;
+const numWords = 10;
 let currentWordIndex = 0;
+let initialVolume = 1.0; // Start volume at 100%
+const volumeDecrement = 0.05; // Decrease volume by 10% each step
 
 // Shuffle array and select first 20 unique words
 while (selectedWords.length < numWords) {
@@ -533,6 +535,7 @@ function startInitialTestSequence() {
 function playWord() {
     const word = selectedWords[currentWordIndex];
     const audio = new SpeechSynthesisUtterance(word);
+    audio.volume = initialVolume;
     window.speechSynthesis.speak(audio);
 }
 
@@ -543,6 +546,7 @@ function checkAnswer() {
         state.initialTestScore++;
     }
     currentWordIndex++;
+    initialVolume -= volumeDecrement; // Decrease volume
     document.getElementById('answer-input').value = '';
     if (currentWordIndex < numWords) {
         playWord();
@@ -783,13 +787,6 @@ function renderChart() {
 function saveResultsAsPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  const date = new Date().toISOString().split('T')[0];
-  const folderName = `${date}_HNO_Test`;
-  const fs = require('fs');
-
-  if (!fs.existsSync(folderName)) {
-    fs.mkdirSync(folderName);
-  }
 
   doc.text('Anamnese und Testergebnisse', 10, 10);
   doc.text('Alter des Patienten: ' + state.age, 10, 20);
@@ -870,8 +867,6 @@ function saveResultsAsPDF() {
       }
     });
 
-    const filePath = `${folderName}/Anamnese_und_Testergebnisse.pdf`;
-    doc.save(filePath);
-    alert(`PDF gespeichert in: ${filePath}`);
+    doc.save('Anamnese_und_Testergebnisse.pdf');
   });
 }
