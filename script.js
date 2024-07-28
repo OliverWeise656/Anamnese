@@ -849,9 +849,9 @@ function saveResultsAsPDF() {
   yPosition += 20;
 
   // Add the chart as an image to the PDF
-  const canvas = document.getElementById('resultsChart');
-  const imgData = canvas.toDataURL('image/png');
-  doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
+  const chartCanvas = document.getElementById('resultsChart');
+  const chartBase64 = chartCanvas.toDataURL('image/png');
+  doc.addImage(chartBase64, 'PNG', 10, yPosition, 180, 100);
 
   // Add the conversation to the PDF
   yPosition += 110;
