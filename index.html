@@ -3,54 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HNO-Anamnese und Hörtest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Sprachverständnis-Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .message {
+            margin: 10px 0;
+        }
+        .user {
+            text-align: right;
+        }
+        .doktor {
+            text-align: left;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/2.9.0/dom-to-image-more.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
 </head>
 <body>
     <div id="chatbot">
-        <h1>HNO-Anamnese</h1>
+        <h1>Virtueller Assistent</h1>
         <div id="messages"></div>
         <input type="text" id="userInput" placeholder="Ihre Nachricht...">
-        <button id="sendButton" onclick="sendMessage()">Senden</button>
+        <button onclick="sendMessage()">Senden</button>
     </div>
 
-    <div id="tone-setting" style="display: none;">
+    <div id="tone-setting" class="hidden">
         <h1>Ton-Einstellung</h1>
         <p>Für die folgenden Tests ist es notwendig Ihren Ton einzustellen:</p>
-        <p>Nach dem Drücken von "Start" hören Sie einen Ton, stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass Sie den Ton gerade noch hören können. Wenn Sie fertig sind, drücken Sie "Stopp".</p>
+        <p>Nach dem Drücken von "Start" hören Sie einen Ton, stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass sie den Ton gerade noch hören können. Wenn Sie fertig sind drücken Sie "Stopp".</p>
         <button id="startButton">Start</button>
         <button id="stopButton" disabled>Stopp</button>
     </div>
 
-    <div id="initial-test" style="display: none;">
+    <div id="initial-test" class="hidden">
         <h1 id="initial-test-heading">Sprachverständnis-Test</h1>
         <p id="initial-instructions">Drücke den Button, um den Test zu starten.</p>
         <button id="start-initial-test-button">Test starten</button>
-        <div id="test-area" style="display: none;">
+        <div id="test-area" class="hidden">
             <p id="audio-instruction"></p>
             <input type="text" id="answer-input">
             <button id="submit-initial-test-button">Bestätigen</button>
         </div>
-        <p id="initial-test-result" style="display: none;"></p>
+        <p id="initial-test-result" class="hidden"></p>
     </div>
 
-    <div id="test" style="display: none;">
-        <p>Hören Sie das Wort und geben Sie es ein:</p>
+    <div id="test" class="hidden">
+        <h1>Sprachverständnis im Störschall</h1>
         <audio id="audioPlayer"></audio>
-        <input type="text" id="response" placeholder="Geben Sie das Wort ein">
-        <button id="nextButton">Weiter</button>
+        <input type="text" id="response" placeholder="Ihr Antwort...">
+        <button id="nextButton">Nächstes Wort</button>
     </div>
 
-    <div id="hearing-test" style="display: none;">
+    <div id="hearing-test" class="hidden">
         <h1>Hörtest</h1>
-        <p id="instructions">Drücken Sie den Knopf, um den Test des rechten Ohres zu starten.</p>
-        <button id="start-right-test-button" onclick="startTest('right')">Rechtes Ohr testen</button>
+        <div id="instructions">
+            <p>Zuerst wird das rechte Ohr getestet. Drücken Sie den Knopf, wenn Sie den Ton hören.</p>
+            <button onclick="startTest('right')">Rechtes Ohr Testen</button>
+        </div>
         <div id="right-test-done" class="hidden">
-            <p>Der Test für das rechte Ohr ist abgeschlossen. Drücken Sie auf "Linkes Ohr testen", um fortzufahren.</p>
-            <button id="start-left-test-button" onclick="startTest('left')">Linkes Ohr testen</button>
+            <p>Der Test des rechten Ohres ist abgeschlossen. Jetzt das linke Ohr testen.</p>
+            <button onclick="startTest('left')">Linkes Ohr Testen</button>
         </div>
         <div id="test-area" class="hidden">
-            <p>Drücken Sie den Knopf, sobald Sie den Ton hören:</p>
             <button onclick="heardTone()">Ton gehört</button>
         </div>
         <div id="results" class="hidden">
@@ -65,14 +87,12 @@
                 </thead>
                 <tbody id="resultsTableBody"></tbody>
             </table>
-            <canvas id="resultsChart"></canvas>
+            <canvas id="resultsChart" width="400" height="200"></canvas>
         </div>
     </div>
 
-    <p id="final-result" style="display: none;"></p>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <div id="final-result" class="hidden"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
