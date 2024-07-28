@@ -22,6 +22,9 @@
         .doktor {
             text-align: left;
         }
+        .test-area {
+            display: none;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/2.9.0/dom-to-image-more.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
@@ -47,7 +50,7 @@
         <h1 id="initial-test-heading">Sprachverständnis-Test</h1>
         <p id="initial-instructions">Drücke den Button, um den Test zu starten.</p>
         <button id="start-initial-test-button">Test starten</button>
-        <div id="test-area" class="hidden">
+        <div id="test-area">
             <p id="audio-instruction"></p>
             <input type="text" id="answer-input">
             <button id="submit-initial-test-button">Bestätigen</button>
@@ -58,7 +61,7 @@
     <div id="test" class="hidden">
         <h1>Sprachverständnis im Störschall</h1>
         <audio id="audioPlayer"></audio>
-        <input type="text" id="response" placeholder="Ihr Antwort...">
+        <input type="text" id="response" placeholder="Ihre Antwort...">
         <button id="nextButton">Nächstes Wort</button>
     </div>
 
@@ -72,7 +75,7 @@
             <p>Der Test des rechten Ohres ist abgeschlossen. Jetzt das linke Ohr testen.</p>
             <button onclick="startTest('left')">Linkes Ohr Testen</button>
         </div>
-        <div id="test-area" class="hidden">
+        <div id="test-area">
             <button onclick="heardTone()">Ton gehört</button>
         </div>
         <div id="results" class="hidden">
