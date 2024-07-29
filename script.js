@@ -867,5 +867,10 @@ function saveResultsAsPDF() {
       }
   });
 
- doc.save('Anamnese_und_Testergebnisse.pdf');
+  doc.save('Anamnese_und_Testergebnisse.pdf');
+
+  // Show thank you message if no redirection occurs
+  if (!state.hearingTestRecommended && !state.voiceAnalysisRecommended) {
+    document.getElementById('thank-you').style.display = 'block';
+  }
 }
