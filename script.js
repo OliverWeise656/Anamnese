@@ -507,7 +507,7 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
                "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
                "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
 const selectedWords = [];
-const numWords = 20;
+const numWords = 5;
 let currentWordIndex = 0;
 let initialVolume = 1.0; // Start volume at 100%
 const volumeDecrement = 0.1; // Decrease volume by 10% each step
@@ -634,7 +634,7 @@ function startHearingTestProcess() {
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -40; // Startlautstärke auf -40 dB setzen
+let currentDb = -60; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
 
@@ -670,7 +670,7 @@ function startToneHearingTest() {
 }
 
 function increaseVolume() {
-  currentDb = -40; // Startlautstärke auf -40 dB setzen
+  currentDb = -60; // Startlautstärke auf -40 dB setzen
   let increaseInterval = setInterval(() => {
     if (currentDb < 90) {
       currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
@@ -869,8 +869,12 @@ function saveResultsAsPDF() {
 
   doc.save('Anamnese_und_Testergebnisse.pdf');
 
-  // Show thank you message if no redirection occurs
-  if (!state.hearingTestRecommended && !state.voiceAnalysisRecommended) {
-    document.getElementById('thank-you').style.display = 'block';
+  // Weiterleitungen basierend auf den Ergebnissen
+  if (state.voiceAnalysisRecommended) {
+      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+  } else if (state.age > 6 && state.age < 16) {
+      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+  } else {
+      alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
   }
 }
