@@ -872,7 +872,7 @@ function saveResultsAsPDF() {
   // Weiterleitungen basierend auf den Ergebnissen
   if (state.voiceAnalysisRecommended) {
       window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-  } else if (state.age > 6 && state.age < 16) {
+  } else if (state.age > 5 && state.age < 16) {
       window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
   } else {
       alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
