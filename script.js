@@ -40,7 +40,7 @@ let state = {
     hearingTestScore: 0
 };
 
-aasync function sendMessage() {
+async function sendMessage() {
     const userInput = document.getElementById('userInput').value;
     if (userInput.trim() === '') return;
 
@@ -59,114 +59,16 @@ aasync function sendMessage() {
     await appendRow([userInput, doctorMessage, new Date().toLocaleString()]);
 
     // Überprüfen Sie, ob eine Weiterleitung erforderlich ist
-    if (state.hearingTestRecommended) {
+    if (state.hearingTestRecommended || state.voiceAnalysisRecommended) {
         setTimeout(() => {
-            startToneSetting();
+            if (state.hearingTestRecommended) {
+                startToneSetting();
+            } else if (state.voiceAnalysisRecommended) {
+                window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+            }
         }, 3000); // 3 Sekunden Verzögerung
-    } else if (state.voiceAnalysisRecommended) {
-        // Keine Weiterleitung hier, die Weiterleitung erfolgt nach dem Hörtest in saveResultsAsPDF
     }
 }
-
-// Funktion zur Speicherung des PDFs und Weiterleitung am Ende
-function saveResultsAsPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    doc.text('Anamnese und Testergebnisse', 10, 10);
-    doc.text('Alter des Patienten: ' + state.age, 10, 20);
-    doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
-
-    let yPosition = 40;
-
-    if (state.painDuration) {
-        doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
-        yPosition += 10;
-        doc.text('Schmerzintensität: ' + state.painIntensity, 10, yPosition);
-        yPosition += 10;
-    }
-
-    if (state.dizzinessDuration) {
-        doc.text('Schwindel seit: ' + state.dizzinessDuration, 10, yPosition);
-        yPosition += 10;
-        doc.text('Schwindelintensität: ' + state.dizzinessIntensity, 10, yPosition);
-        yPosition += 10;
-    }
-
-    if (state.tinnitusDuration) {
-        doc.text('Ohrgeräusche/Tinnitus seit: ' + state.tinnitusDuration, 10, yPosition);
-        yPosition += 10;
-        doc.text('Ohr: ' + state.tinnitusEar, 10, yPosition);
-        yPosition += 10;
-        doc.text('Tinnitusintensität: ' + state.tinnitusIntensity, 10, yPosition);
-        yPosition += 10;
-    }
-
-    if (state.hearingLossDuration) {
-        doc.text('Hörprobleme seit: ' + state.hearingLossDuration, 10, yPosition);
-        yPosition += 10;
-        doc.text('Ohr: ' + state.hearingLossEar, 10, yPosition);
-        yPosition += 10;
-        doc.text('Hörproblemeintensität: ' + state.hearingLossIntensity, 10, yPosition);
-        yPosition += 10;
-    }
-
-    if (state.weightLoss !== null && state.weightLoss !== 'nein') {
-        doc.text('Unfreiwilliger Gewichtsverlust: ' + state.weightLoss, 10, yPosition);
-        yPosition += 10;
-        if (state.weightLossAmount !== null) {
-            doc.text('Details zum Gewichtsverlust: ' + state.weightLossAmount, 10, yPosition);
-            yPosition += 10;
-        }
-    }
-
-    doc.text('Testergebnisse:', 10, yPosition);
-    yPosition += 10;
-
-    frequencies.forEach(freq => {
-        doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
-        yPosition += 10;
-    });
-
-    doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
-    yPosition += 10;
-    doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
-    yPosition += 20;
-
-    // Add the chart as an image to the PDF
-    const canvas = document.getElementById('resultsChart');
-    const imgData = canvas.toDataURL('image/png');
-    doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
-
-    // Add the conversation to the PDF
-    yPosition += 110;
-    doc.text('Chatbot Konversation:', 10, yPosition);
-    yPosition += 10;
-    conversation.forEach((msg, index) => {
-        const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
-        doc.text(text, 10, yPosition);
-        yPosition += 10;
-        if (yPosition > 280) { // Add new page if the content is too long
-            doc.addPage();
-            yPosition = 10;
-        }
-    });
-
-    doc.save('Anamnese_und_Testergebnisse.pdf');
-
-    // Weiterleitungen basierend auf den Ergebnissen
-    setTimeout(() => {
-        if (state.voiceAnalysisRecommended) {
-            window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-        } else if (state.age > 6 && state.age < 16) {
-            window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-        } else {
-            alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
-        }
-    }, 3000); // 3 Sekunden Verzögerung
-}
-
-
 
 async function getDoctorResponse(userInput) {
     if (state.age === null) {
@@ -198,7 +100,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Ohrgeräusche/Tinnitus?';
         } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
             return 'Wie lange haben Sie schon Hörprobleme?';
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')|| state.reason.includes('gewichtsverlust')) {
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
         } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')) {
             state.voiceAnalysisRecommended = true;
@@ -605,7 +507,7 @@ const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisc
                "zug", "bus", "flugzeug", "schiff", "fahrrad", "wagen", "bahn", "straße", "brücke", "garten", 
                "baum", "strauch", "blume", "wiese", "feld", "wald", "park", "teich", "fluss", "bach"];
 const selectedWords = [];
-const numWords = 5;
+const numWords = 20;
 let currentWordIndex = 0;
 let initialVolume = 1.0; // Start volume at 100%
 const volumeDecrement = 0.1; // Decrease volume by 10% each step
@@ -732,7 +634,7 @@ function startHearingTestProcess() {
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -60; // Startlautstärke auf -40 dB setzen
+let currentDb = -40; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
 
@@ -768,7 +670,7 @@ function startToneHearingTest() {
 }
 
 function increaseVolume() {
-  currentDb = -60; // Startlautstärke auf -40 dB setzen
+  currentDb = -40; // Startlautstärke auf -40 dB setzen
   let increaseInterval = setInterval(() => {
     if (currentDb < 90) {
       currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
@@ -967,18 +869,8 @@ function saveResultsAsPDF() {
 
   doc.save('Anamnese_und_Testergebnisse.pdf');
 
-  // Weiterleitungen basierend auf den Ergebnissen
-  if (state.voiceAnalysisRecommended) {
-      setTimeout(() => {
-          window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-      }, 3000); 
-  } else if (state.age > 5 && state.age < 17) {
-      setTimeout(() => {
-          window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-      }, 3000);
-  } else {
-      setTimeout(() => {
-          alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
-      }, 3000);
+  // Show thank you message if no redirection occurs
+  if (!state.hearingTestRecommended && !state.voiceAnalysisRecommended) {
+    document.getElementById('thank-you').style.display = 'block';
   }
 }
