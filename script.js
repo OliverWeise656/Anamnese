@@ -867,5 +867,5 @@ function saveResultsAsPDF() {
       }
   });
 
-  doc.save('Anamnese_und_Testergebnisse.pdf');
+ doc.save('Anamnese_und_Testergebnisse.pdf');
 }
