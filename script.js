@@ -309,21 +309,21 @@ function updateUrgency(duration, intensity, isChild = false) {
     const days = parseInt(duration.split(' ')[0]); // Annahme, dass die Eingabe im Format "X Tage" erfolgt
     if (isChild) {
         if (days < 4 && intensity > 5) {
-            state.urgency = 'direkt';
+            state.urgency = 'regulär';
         } else if (days <= 2) {
-            state.urgency = intensity > 6 ? 'direkt' : 'schnell';
+            state.urgency = intensity > 6 ? 'schnell' : 'regulär';
         } else if (days <= 5) {
-            state.urgency = intensity > 6 ? 'direkt' : 'schnell';
+            state.urgency = intensity > 6 ? 'schnell' : 'regulär';
         } else {
-            state.urgency = intensity > 8 ? 'schnell' : 'normal';
+            state.urgency = intensity > 8 ? 'regulär' : 'regulär';
         }
     } else {
         if (days <= 2) {
-            state.urgency = intensity > 6 ? 'direkt' : 'schnell';
+            state.urgency = intensity > 6 ? 'schnell' : 'regulär';
         } else if (days <= 5) {
-            state.urgency = intensity > 6 ? 'direkt' : 'schnell';
+            state.urgency = intensity > 6 ? 'schnell' : 'regulär';
         } else {
-            state.urgency = intensity > 8 ? 'schnell' : 'normal';
+            state.urgency = intensity > 8 ? 'regulär' : 'regulär';
         }
     }
 }
@@ -336,8 +336,10 @@ function checkWeightLossUrgency(weightLossAmount) {
         const weight = parseInt(weightLoss[1]);
         const weeks = parseInt(timePeriod[1]);
 
-        if (weight / weeks > 1) {
-            state.urgency = 'schnell';
+           if (weight / weeks > 1) {
+            state.urgency = 'direkt';
+        } else {
+            state.urgency = 'regulär';
         }
     }
 }
