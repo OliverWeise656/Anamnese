@@ -510,7 +510,7 @@ const selectedWords = [];
 const numWords = 10;
 let currentWordIndex = 0;
 let initialVolume = 1.0; // Start volume at 100%
-const volumeDecrement = 0.15; // Decrease volume by 10% each step
+const volumeDecrement = 0.1; // Decrease volume by 10% each step
 
 // Shuffle array and select first 20 unique words
 while (selectedWords.length < numWords) {
