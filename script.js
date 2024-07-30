@@ -339,7 +339,7 @@ function checkWeightLossUrgency(weightLossAmount) {
            if (weight / weeks > 1) {
             state.urgency = 'direkt';
         } else {
-            state.urgency = 'regulär';
+            state.urgency = 'schnell';
         }
     }
 }
