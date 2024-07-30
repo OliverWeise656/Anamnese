@@ -100,7 +100,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Ohrgeräusche/Tinnitus?';
         } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
             return 'Wie lange haben Sie schon Hörprobleme?';
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')) {
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
         } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')) {
             state.voiceAnalysisRecommended = true;
