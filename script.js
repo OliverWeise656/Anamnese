@@ -896,7 +896,7 @@ function startHearingTestProcess() {
     } else if (state.age > 6 && state.age < 16) {
       window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
     } else {
-      alert('Herzlichen Dank für Ihre Mitarbeit. Auf Ihrem Desktop wurden ihre Ergebnisse unter 'Anamnese_und_Testergebnisse.pdf' abgelegt. Bitte leiten sie diese entweder über unsere email Adresse info@hno-stuttgart.com oder direkt weiter oder laden Sie sie im Terminvergabe-System hoch. Sie helfen uns so Ihren Besuch besser zu planen und sparen sich u.U. viel Zeit in der Praxis!');
+      alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
     }
   }, 3000);
 }
