@@ -738,10 +738,6 @@ function renderChart() {
   const rightData = frequencies.map(freq => -results.right[freq] || -90);
   const leftData = frequencies.map(freq => -results.left[freq] || -90);
 
-  // Transformation der dB-Werte, sodass -60 dem Wert 0 entspricht
-  const transformedRightData = rightData.map(db => db + 60);
-  const transformedLeftData = leftData.map(db => db + 60);
-
   new Chart(ctx, {
     type: 'line',
     data: {
@@ -749,14 +745,14 @@ function renderChart() {
       datasets: [
         {
           label: 'Rechts',
-          data: transformedRightData,
+          data: rightData,
           borderColor: 'red',
           fill: false,
           tension: 0.1
         },
         {
           label: 'Links',
-          data: transformedLeftData,
+          data: leftData,
           borderColor: 'blue',
           fill: false,
           tension: 0.1
@@ -769,23 +765,19 @@ function renderChart() {
           beginAtZero: true,
           ticks: {
             callback: function(value) {
-              return (value - 60) + ' dB'; // Umwandlung zurück zu den ursprünglichen Werten
+              return value + ' dB';
             }
           },
           title: {
             display: true,
             text: 'Hörschwelle (dB)'
-          },
-          reverse: true, // y-Achse umkehren
-          min: 0,
-          max: 30 // Annahme, dass der maximale transformierte Wert 30 ist (entspricht -30 dB)
+          }
         },
         x: {
           title: {
             display: true,
             text: 'Frequenz (Hz)'
-          },
-          position: 'top' // x-Achse oben anzeigen
+          }
         }
       }
     }
