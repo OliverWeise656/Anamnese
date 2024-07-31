@@ -100,7 +100,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Ohrgeräusche/Tinnitus?';
         } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
             return 'Wie lange haben Sie schon Hörprobleme?';
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')|| state.reason.includes('gewichtsverlust')|| state.reason.includes('schluckstörung')) {
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
         } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')) {
             state.voiceAnalysisRecommended = true;
@@ -878,13 +878,13 @@ function saveResultsAsPDF() {
     } else if (state.age > 6 && state.age < 16) {
       setTimeout(() => {
         window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-      }, 5000);
+      }, 3000);
     } else {
       setTimeout(() => {
         alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
-      }, 5000);
+      }, 3000);
     }
-  }, 5000);
+  }, 3000);
 }
 
 function startHearingTestProcess() {
@@ -900,5 +900,5 @@ function startHearingTestProcess() {
     } else {
       alert('Herzlichen Dank für Ihre Mitarbeit. Auf dem Desktop wurden ihre Ergebnisse abgelegt. Bitte leiten sie diese an uns weiter!');
     }
-  }, 5000);
+  }, 3000);
 }
