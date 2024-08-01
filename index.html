@@ -17,7 +17,7 @@
             color: #333;
             box-sizing: border-box;
         }
-        #chatbot, #tone-setting, #initial-test, #test, #hearing-test {
+        #chatbot, #tone-setting, #initial-test, #hearing-test-info, #test, #hearing-test {
             background: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -128,6 +128,12 @@
             <button id="submit-initial-test-button">Bestätigen</button>
         </div>
         <p id="initial-test-result" class="hidden"></p>
+    </div>
+
+    <div id="hearing-test-info" class="hidden">
+        <h1>Sprachverständnis im Störschall</h1>
+        <p>In diesem Test werden Ihnen Wörter im Hintergrundrauschen vorgespielt. Ihre Aufgabe ist es, das gehörte Wort in das Textfeld einzugeben.</p>
+        <button id="start-hearing-test-button">Test starten</button>
     </div>
 
     <div id="test" class="hidden">

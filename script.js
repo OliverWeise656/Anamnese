@@ -565,6 +565,9 @@ function showInitialResult() {
 }
 
 // --- Ab hier ist der Hörtest im Störschall Teil ---
+// Vorheriger Code bleibt unverändert
+
+// Sprachverständnis im Störschall Test
 const audioFiles = [
   {name: 'Schuh', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Schuh.m4a?v=1720614938001'},
   {name: 'Sohn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Sohn.m4a?v=1720614938455'},
@@ -586,8 +589,15 @@ const audioFiles = [
 let testWords = [];
 let currentHearingWordIndex = 0;
 
-function startHearingTest() {
+document.getElementById('start-hearing-test-button').addEventListener('click', startHearingTest);
+
+function showHearingTestInfo() {
     document.getElementById('initial-test').style.display = 'none';
+    document.getElementById('hearing-test-info').style.display = 'block';
+}
+
+function startHearingTest() {
+    document.getElementById('hearing-test-info').style.display = 'none';
     document.getElementById('test').style.display = 'block';
     startHearingTestSequence();
 }
@@ -629,6 +639,19 @@ function showFinalResult() {
     startHearingTestProcess();
   }, 3000);
 }
+
+function startHearingTestProcess() {
+  document.getElementById('hearing-test').style.display = 'block';
+}
+
+// Call showHearingTestInfo() after the initial test is completed
+function showInitialResult() {
+    document.getElementById('test-area').style.display = 'none';
+    document.getElementById('initial-test-result').style.display = 'block';
+    document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
+    setTimeout(showHearingTestInfo, 3000);
+}
+
 
 function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
