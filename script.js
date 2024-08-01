@@ -735,8 +735,8 @@ function displayResults() {
 
 function renderChart() {
   const ctx = document.getElementById('resultsChart').getContext('2d');
-  const rightData = frequencies.map(freq => -results.right[freq] || -90);
-  const leftData = frequencies.map(freq => -results.left[freq] || -90);
+  const rightData = frequencies.map(freq => results.right[freq] !== undefined ? results.right[freq] + 60 : null);
+  const leftData = frequencies.map(freq => results.left[freq] !== undefined ? results.left[freq] + 60 : null);
 
   new Chart(ctx, {
     type: 'line',
@@ -762,18 +762,31 @@ function renderChart() {
     options: {
       scales: {
         y: {
-          beginAtZero: true,
+          reverse: true,
+          min: 0,
+          max: 150, // -60 dB to 90 dB
           ticks: {
             callback: function(value) {
-              return value + ' dB';
+              // Adjust the displayed value to match the desired dB scale
+              if (value === 0) return '0 dB';
+              if (value === 20) return '-20 dB';
+              if (value === 40) return '-40 dB';
+              if (value === 60) return '-60 dB';
+              if (value === 80) return '-80 dB';
+              if (value === 100) return '-100 dB';
+              if (value === 120) return '-120 dB';
+              if (value === 140) return '-140 dB';
+              if (value === 150) return '-150 dB';
+              return (value - 60) + ' dB';
             }
           },
           title: {
             display: true,
-            text: 'Hörschwelle (dB)'
+            text: 'Hörschwelle (dB HL)'
           }
         },
         x: {
+          position: 'top',
           title: {
             display: true,
             text: 'Frequenz (Hz)'
