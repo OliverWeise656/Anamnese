@@ -102,7 +102,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Hörprobleme?';
         } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
-        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')) {
+        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')|| state.reason.includes('Stimmverlust') || state.reason.includes('Probleme mit dem Singen') ) {
             state.voiceAnalysisRecommended = true;
             return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
         }
