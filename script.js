@@ -66,7 +66,7 @@ async function sendMessage() {
             } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://classic-broadleaf-blender.glitch.me';
             }
-        }, 6000); // 3 Sekunden Verzögerung
+        }, 10000); // 10 Sekunden Verzögerung
     }
 }
 
