@@ -393,11 +393,11 @@ function getAdditionalRecommendations(reason, age) {
     let recommendation = '';
     if (age > 4) {
         state.hearingTestRecommended = true;
-        recommendation += ' Wir empfehlen Ihnen, einen Hörtest zu machen.';
+        recommendation += ' Wir empfehlen Ihnen, einen Hörtest durchzuführen.';
     }
     if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimme')) {
         state.voiceAnalysisRecommended = true;
-        recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse zu machen.';
+        recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse durchzuführen.';
     }
     return recommendation;
 }
