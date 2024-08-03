@@ -822,6 +822,21 @@ function renderChart() {
   document.getElementById('resultsChart').classList.remove('hidden');
 }
 
+ // Warten Sie, bis das Chart gerendert ist, bevor Sie es speichern
+  setTimeout(() => {
+    saveChartAsPNG(chart);
+  }, 500); // 0.5 Sekunden Verzögerung, um sicherzustellen, dass das Chart gerendert ist
+}
+
+function saveChartAsPNG(chart) {
+  const link = document.createElement('a');
+  link.href = chart.toBase64Image();
+  link.download = 'Hörtest_Ergebnisse.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 function saveResultsAsPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -886,7 +901,7 @@ function saveResultsAsPDF() {
   doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
   yPosition += 20;
 
-  // Add the chart as an image to the PDF
+   // Add the chart as an image to the PDF
   const canvas = document.getElementById('resultsChart');
   const imgData = canvas.toDataURL('image/png');
   doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
