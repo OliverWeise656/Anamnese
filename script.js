@@ -569,21 +569,21 @@ function showInitialResult() {
 
 // Sprachverständnis im Störschall Test
 const audioFiles = [
-  {name: 'Baum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Baum.mp3?v=1722698419635'},
-  {name: 'brav', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/brav.mp3?v=1722698420157'},
-  {name: 'Dach', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Dach.mp3?v=1722698420554'},
-  {name: 'Fass', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Fass.mp3?v=1722698420938'},
-  {name: 'Hund', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Hund.mp3?v=1722698421263'},
-  {name: 'klein', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/klein.mp3?v=1722698421581'},
-  {name: 'laut', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/laut.mp3?v=1722698421872'},
-  {name: 'Mann', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Mann.mp3?v=1722698422208'},
-  {name: 'nass', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/nass.mp3?v=1722698422522'},
-  {name: 'Raum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Raum.mp3?v=1722698422836'},
-  {name: 'Saal', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Saal.mp3?v=1722698423193'},
-  {name: 'Schuh', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Schuh.mp3?v=1722698423577'},
-  {name: 'Sohn', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Sohn.mp3?v=1722698423965'},
-  {name: 'weiß', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/wei%C3%9F.mp3?v=1722698424270'},
-  {name: 'Zahn', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Zahn.mp3?v=1722698424706'}
+  {name: 'Schuh', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Schuh.m4a?v=1720614938001'},
+  {name: 'Sohn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Sohn.m4a?v=1720614938455'},
+  {name: 'weiß', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/wei%C3%9F.m4a?v=1720614938967'},
+  {name: 'Zahn', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Zahn.m4a?v=1720614939437'},
+  {name: 'brav', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/brav.m4a?v=1720614939817'},
+  {name: 'Baum', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Baum.m4a?v=1720614940236'},
+  {name: 'Dach', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Dach.m4a?v=1720614940678'},
+  {name: 'Fass', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Fass.m4a?v=1720614941077'},
+  {name: 'Hund', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Hund.m4a?v=1720614941430'},
+  {name: 'klein', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/klein.m4a?v=1720614941788'},
+  {name: 'laut', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/laut.m4a?v=1720614942187'},
+  {name: 'Mann', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Mann.m4a?v=1720614942555'},
+  {name: 'nass', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/nass.m4a?v=1720614942946'},
+  {name: 'Raum', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Raum.m4a?v=1720614943371'},
+  {name: 'Saal', url: 'https://cdn.glitch.global/1208bf51-3981-40d2-906e-24c39a0af93f/Saal.m4a?v=1720614943788'}
 ];
 
 let testWords = [];
@@ -822,21 +822,6 @@ function renderChart() {
   document.getElementById('resultsChart').classList.remove('hidden');
 }
 
- // Warten Sie, bis das Chart gerendert ist, bevor Sie es speichern
-  setTimeout(() => {
-    saveChartAsPNG(chart);
-  }, 500); // 0.5 Sekunden Verzögerung, um sicherzustellen, dass das Chart gerendert ist
-}
-
-function saveChartAsPNG(chart) {
-  const link = document.createElement('a');
-  link.href = chart.toBase64Image();
-  link.download = 'Hörtest_Ergebnisse.png';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
 function saveResultsAsPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -901,7 +886,7 @@ function saveResultsAsPDF() {
   doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
   yPosition += 20;
 
-   // Add the chart as an image to the PDF
+  // Add the chart as an image to the PDF
   const canvas = document.getElementById('resultsChart');
   const imgData = canvas.toDataURL('image/png');
   doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
