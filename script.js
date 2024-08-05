@@ -66,7 +66,7 @@ async function sendMessage() {
             } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://classic-broadleaf-blender.glitch.me';
             }
-        }, 10000); // 10 Sekunden Verzögerung
+        }, 12000); // 10 Sekunden Verzögerung
     }
 }
 
@@ -80,7 +80,7 @@ async function getDoctorResponse(userInput) {
         if (state.isChild) {
             if (state.age < 5) {
                 return 'Wurde beim Kind als Säugling ein Hörscreening durchgeführt?';
-            } else if (state.age < 7) {
+            } else if (state.age < 6) {
                 return 'Geht das Kind in den Kindergarten?';
             } else {
                 return 'Geht das Kind in die Schule?';
