@@ -66,7 +66,7 @@ async function sendMessage() {
             } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://classic-broadleaf-blender.glitch.me';
             }
-        }, 9000); // 10 Sekunden Verzögerung
+        }, 10000); // 10 Sekunden Verzögerung
     }
 }
 
@@ -649,7 +649,7 @@ function showInitialResult() {
     document.getElementById('test-area').style.display = 'none';
     document.getElementById('initial-test-result').style.display = 'block';
     document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
-    setTimeout(showHearingTestInfo, 3000);
+    setTimeout(showHearingTestInfo, 5000);
 }
 
 
