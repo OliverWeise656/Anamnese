@@ -177,7 +177,7 @@ async function getDoctorResponse(userInput) {
                 updateUrgency(state.hearingLossDuration, state.hearingLossIntensity);
                 return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
             }
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')) {
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme') || state.reason.includes('gewichtsverlust')) {
             if (state.weightLoss === null) {
                 state.weightLoss = userInput.toLowerCase();
                 if (state.weightLoss === 'ja') {
@@ -395,7 +395,7 @@ function getAdditionalRecommendations(reason, age) {
         state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest durchzuführen.';
     }
-    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimme')) {
+    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimme')|| reason.includes('singen')) {
         state.voiceAnalysisRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse durchzuführen.';
     }
@@ -649,7 +649,7 @@ function showInitialResult() {
     document.getElementById('test-area').style.display = 'none';
     document.getElementById('initial-test-result').style.display = 'block';
     document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
-    setTimeout(showHearingTestInfo, 5000);
+    setTimeout(showHearingTestInfo, 3000);
 }
 
 
