@@ -177,23 +177,23 @@ async function getDoctorResponse(userInput) {
                 updateUrgency(state.hearingLossDuration, state.hearingLossIntensity);
                 return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
             }
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme') || state.reason.includes('gewichtsverlust')) {
-            if (state.weightLoss === null) {
-                state.weightLoss = userInput.toLowerCase();
-                if (state.weightLoss === 'ja') {
-                    return 'Wie viel Gewicht haben Sie in welchem Zeitraum unfreiwillig verloren?';
-                }
-                state.weightLoss = 'nein';
-                return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
-            }
-            if (state.weightLoss === 'ja' && state.weightLossAmount === null) {
-                state.weightLossAmount = userInput.toLowerCase();
-                checkWeightLossUrgency(state.weightLossAmount);
-                return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
-            }
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme') || state.reason.includes('gewichtsverlust') || state.reason.includes('schluckstörungen') ) {
+    if (state.weightLoss === null) {
+        state.weightLoss = userInput.toLowerCase();
+        if (state.weightLoss === 'ja') {
+            state.urgency = 'schnell'; // Setze die Dringlichkeit auf 'schnell', wenn Gewicht verloren wurde
+            return 'Wie viel Gewicht haben Sie in welchem Zeitraum unfreiwillig verloren? (z.B. 5 kg in 3 Wochen)';
         }
+        state.weightLoss = 'nein';
+        return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
     }
+    if (state.weightLoss === 'ja' && state.weightLossAmount === null) {
+        state.weightLossAmount = userInput.toLowerCase();
+        return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
+    }
+}
 
+    }
     if (state.isChild !== null && state.isChild) {
         if (state.age < 5 && state.hearingScreening === null) {
             state.hearingScreening = userInput.toLowerCase();
