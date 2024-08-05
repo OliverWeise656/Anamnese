@@ -915,8 +915,8 @@ function saveResultsAsPDF() {
       window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
     } else {
       setTimeout(() => {
-        alert('Vielen Dank für Ihre Mitarbeit! Auf Ihrem Desktop wurden folgende PDF abgelegt: Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com oder bringen Sie sie ausgedruckt zu Ihrem Besuch bei uns mit. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!');
-      }, 5000);
+        alert('Vielen Dank für Ihre Mitarbeit! Auf Ihrem Desktop wurden folgende PDF abgelegt:  Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com oder bringen Sie sie ausgedruckt zu Ihrem Besuch bei uns mit. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!');
+      }, 2000);
     }
   }, 5000);
 }
