@@ -734,25 +734,6 @@ function stopToneHearingTest() {
 }
 
 function displayResults() {
-  let tableBody = document.getElementById('resultsTableBody');
-  tableBody.innerHTML = '';
-
-  frequencies.forEach(freq => {
-    let row = document.createElement('tr');
-    let freqCell = document.createElement('td');
-    let rightCell = document.createElement('td');
-    let leftCell = document.createElement('td');
-
-    freqCell.textContent = freq;
-    rightCell.textContent = results.right[freq] || 'N/A';
-    leftCell.textContent = results.left[freq] || 'N/A';
-
-    row.appendChild(freqCell);
-    row.appendChild(rightCell);
-    row.appendChild(leftCell);
-    tableBody.appendChild(row);
-  });
-
   document.getElementById('results').classList.remove('hidden');
 }
 
