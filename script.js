@@ -916,7 +916,14 @@ function saveResultsAsPDF() {
             doc.text('Zusammenfassung der Chatbot Konversation:', 10, yPosition);
             yPosition += 10;
             doc.text(summary, 10, yPosition);
-            doc.save('Anamnese_und_Testergebnisse.pdf');
+
+            // Datum und Uhrzeit für den Dateinamen hinzufügen
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+            const fileName = `Anamnese_und_Testergebnisse_${dateStr}_${timeStr}.pdf`;
+
+            doc.save(fileName);
 
             // Weiterleitungen basierend auf den Ergebnissen
             setTimeout(() => {
@@ -926,7 +933,7 @@ function saveResultsAsPDF() {
                     window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
                 } else {
                     setTimeout(() => {
-                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
+                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
                     }, 5000);
                 }
             }, 5000);
