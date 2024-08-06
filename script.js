@@ -3,7 +3,7 @@ const clientId = '1093697496533-5pbn5mgp80hecng0lsemu94dci88oe4g.apps.googleuser
 const spreadsheetId = '1GRPTS1oa3rAdapYTaCg01ZOHDKKxQJ8T9doeSF_HGrA'; // Ihre Google Sheets ID
 
 let conversation = [
-    { role: 'system', content: 'Du bist ein virtueller Assistent für eine HNO-Praxis, der Patienten bei der Anamnese hilft.' }
+    { role: 'system', content: 'Alter des Patienten:' }
 ];
 
 let state = {
