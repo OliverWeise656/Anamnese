@@ -66,7 +66,7 @@ async function sendMessage() {
             } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://classic-broadleaf-blender.glitch.me';
             }
-        }, 12000); // 10 Sekunden Verzögerung
+        }, 9000); // 10 Sekunden Verzögerung
     }
 }
 
@@ -933,7 +933,7 @@ function saveResultsAsPDF() {
                     window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
                 } else {
                     setTimeout(() => {
-                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
+                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com oder bringen Sie sie ausgedruckt zu Ihrem Besuch bei uns mit. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
                     }, 5000);
                 }
             }, 5000);
