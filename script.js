@@ -873,20 +873,11 @@ function saveResultsAsPDF() {
         }
     }
 
-    doc.text('Testergebnisse:', 10, yPosition);
-    yPosition += 10;
-
-    frequencies.forEach(freq => {
-        doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
-        yPosition += 10;
-    });
-
     doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
     yPosition += 10;
     doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
     yPosition += 20;
 
-    // Wait for the chart to render
     setTimeout(() => {
         html2canvas(document.querySelector("#resultsChart")).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
