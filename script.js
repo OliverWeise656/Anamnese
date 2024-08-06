@@ -633,7 +633,7 @@ function nextHearingWord() {
 function showFinalResult() {
   document.getElementById('test').style.display = 'none';
   document.getElementById('final-result').style.display = 'block';
-  document.getElementById('final-result').innerText = 'Test beendet! Deine Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
+  document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
   setTimeout(() => {
     document.getElementById('final-result').style.display = 'none';
     startHearingTestProcess();
@@ -648,7 +648,7 @@ function startHearingTestProcess() {
 function showInitialResult() {
     document.getElementById('test-area').style.display = 'none';
     document.getElementById('initial-test-result').style.display = 'block';
-    document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
+    document.getElementById('initial-test-result').innerText = 'Test beendet! Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
     setTimeout(showHearingTestInfo, 3000);
 }
 
@@ -803,6 +803,52 @@ function renderChart() {
   document.getElementById('resultsChart').classList.remove('hidden');
 }
 
+function generateSummary() {
+    let summary = `Alter des Patienten: ${state.age} Jahre\n`;
+    if (state.isChild) {
+        if (state.age < 5) {
+            summary += `Hörscreening als Säugling: ${state.hearingScreening ? 'Ja' : 'Nein'}\n`;
+            if (state.hearingScreening) {
+                summary += `Ergebnis des Hörscreenings: ${state.hearingScreeningResult}\n`;
+            }
+        }
+        if (state.age < 7) {
+            summary += `Kindergarten: ${state.kindergarten ? 'Ja' : 'Nein'}\n`;
+            if (state.kindergarten) {
+                summary += `Einrichtung: ${state.kindergarten}\n`;
+            }
+        } else {
+            summary += `Schule: ${state.school}\nSchulart: ${state.schoolType}\nIntegration: ${state.integration}\n`;
+        }
+        summary += `Geschwister: ${state.siblings ? 'Ja' : 'Nein'}\n`;
+        if (state.siblings) {
+            summary += `Anzahl der Geschwister: ${state.siblingsCount}\n`;
+            summary += `Alter der Geschwister: ${state.siblingsAges.join(', ')}\n`;
+        }
+    }
+    summary += `Grund des Besuchs: ${state.reason}\n`;
+    if (state.painDuration) {
+        summary += `Schmerzen seit: ${state.painDuration}\nSchmerzintensität: ${state.painIntensity}\n`;
+    }
+    if (state.dizzinessDuration) {
+        summary += `Schwindel seit: ${state.dizzinessDuration}\nSchwindelintensität: ${state.dizzinessIntensity}\n`;
+    }
+    if (state.tinnitusDuration) {
+        summary += `Ohrgeräusche/Tinnitus seit: ${state.tinnitusDuration}\nOhr: ${state.tinnitusEar}\nTinnitusintensität: ${state.tinnitusIntensity}\n`;
+    }
+    if (state.hearingLossDuration) {
+        summary += `Hörprobleme seit: ${state.hearingLossDuration}\nOhr: ${state.hearingLossEar}\nHörproblemeintensität: ${state.hearingLossIntensity}\n`;
+    }
+    if (state.weightLoss !== null && state.weightLoss !== 'nein') {
+        summary += `Unfreiwilliger Gewichtsverlust: ${state.weightLoss}\n`;
+        if (state.weightLossAmount !== null) {
+            summary += `Details zum Gewichtsverlust: ${state.weightLossAmount}\n`;
+        }
+    }
+    return summary;
+}
+
+
 function saveResultsAsPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -864,20 +910,12 @@ function saveResultsAsPDF() {
             const imgData = canvas.toDataURL('image/png');
             doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
 
-            // Add the conversation to the PDF
+            // Add the summary to the PDF
             yPosition += 110;
-            doc.text('Chatbot Konversation:', 10, yPosition);
+            const summary = generateSummary();
+            doc.text('Zusammenfassung der Chatbot Konversation:', 10, yPosition);
             yPosition += 10;
-            conversation.forEach((msg, index) => {
-                const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
-                doc.text(text, 10, yPosition);
-                yPosition += 10;
-                if (yPosition > 280) { // Add new page if the content is too long
-                    doc.addPage();
-                    yPosition = 10;
-                }
-            });
-
+            doc.text(summary, 10, yPosition);
             doc.save('Anamnese_und_Testergebnisse.pdf');
 
             // Weiterleitungen basierend auf den Ergebnissen
