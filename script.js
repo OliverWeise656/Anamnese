@@ -3,7 +3,7 @@ const clientId = '1093697496533-5pbn5mgp80hecng0lsemu94dci88oe4g.apps.googleuser
 const spreadsheetId = '1GRPTS1oa3rAdapYTaCg01ZOHDKKxQJ8T9doeSF_HGrA'; // Ihre Google Sheets ID
 
 let conversation = [
-    { role: 'system', content: 'Wie ist das Alter des Patienten?' }
+    { role: 'system', content: 'Du bist ein virtueller Assistent für eine HNO-Praxis, der Patienten bei der Anamnese hilft.' }
 ];
 
 let state = {
@@ -102,7 +102,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Hörprobleme?';
         } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluckprobleme')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
-        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')|| state.reason.includes('Stimmverlust') || state.reason.includes('Sing') || state.reason.includes('stimm') || state.reason.includes('stimmprobleme')) {
+        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')|| state.reason.includes('Stimmverlust') || state.reason.includes('Probleme mit dem Singen') ) {
             state.voiceAnalysisRecommended = true;
             return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
         }
@@ -395,7 +395,7 @@ function getAdditionalRecommendations(reason, age) {
         state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest durchzuführen.';
     }
-    if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')|| state.reason.includes('Stimmverlust') || state.reason.includes('Sing') || state.reason.includes('stimm') || state.reason.includes('stimmprobleme')) {
+    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimme')|| reason.includes('singen')) {
         state.voiceAnalysisRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse durchzuführen.';
     }
@@ -823,100 +823,103 @@ function renderChart() {
 }
 
 function saveResultsAsPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-  doc.text('Anamnese und Testergebnisse', 10, 10);
-  doc.text('Alter des Patienten: ' + state.age, 10, 20);
-  doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
+    doc.text('Anamnese und Testergebnisse', 10, 10);
+    doc.text('Alter des Patienten: ' + state.age, 10, 20);
+    doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
 
-  let yPosition = 40;
+    let yPosition = 40;
 
-  if (state.painDuration) {
-    doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Schmerzintensität: ' + state.painIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.dizzinessDuration) {
-    doc.text('Schwindel seit: ' + state.dizzinessDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Schwindelintensität: ' + state.dizzinessIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.tinnitusDuration) {
-    doc.text('Ohrgeräusche/Tinnitus seit: ' + state.tinnitusDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Ohr: ' + state.tinnitusEar, 10, yPosition);
-    yPosition += 10;
-    doc.text('Tinnitusintensität: ' + state.tinnitusIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.hearingLossDuration) {
-    doc.text('Hörprobleme seit: ' + state.hearingLossDuration, 10, yPosition);
-    yPosition += 10;
-    doc.text('Ohr: ' + state.hearingLossEar, 10, yPosition);
-    yPosition += 10;
-    doc.text('Hörproblemeintensität: ' + state.hearingLossIntensity, 10, yPosition);
-    yPosition += 10;
-  }
-
-  if (state.weightLoss !== null && state.weightLoss !== 'nein') {
-    doc.text('Unfreiwilliger Gewichtsverlust: ' + state.weightLoss, 10, yPosition);
-    yPosition += 10;
-    if (state.weightLossAmount !== null) {
-      doc.text('Details zum Gewichtsverlust: ' + state.weightLossAmount, 10, yPosition);
-      yPosition += 10;
+    if (state.painDuration) {
+        doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Schmerzintensität: ' + state.painIntensity, 10, yPosition);
+        yPosition += 10;
     }
-  }
 
-  doc.text('Testergebnisse:', 10, yPosition);
-  yPosition += 10;
-
-  frequencies.forEach(freq => {
-    doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
-    yPosition += 10;
-  });
-
-  doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
-  yPosition += 10;
-  doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
-  yPosition += 20;
-
-  // Add the chart as an image to the PDF
-  const canvas = document.getElementById('resultsChart');
-  const imgData = canvas.toDataURL('image/png');
-  doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
-
-  // Add the conversation to the PDF
-  yPosition += 110;
-  doc.text('Chatbot Konversation:', 10, yPosition);
-  yPosition += 10;
-  conversation.forEach((msg, index) => {
-      const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
-      doc.text(text, 10, yPosition);
-      yPosition += 10;
-      if (yPosition > 280) { // Add new page if the content is too long
-          doc.addPage();
-          yPosition = 10;
-      }
-  });
-
-  doc.save('Anamnese_und_Testergebnisse.pdf');
-
-  // Weiterleitungen basierend auf den Ergebnissen
-  setTimeout(() => {
-    if (state.voiceAnalysisRecommended) {
-      window.location.href = 'https://classic-broadleaf-blender.glitch.me';
-    } else if (state.age > 6 && state.age < 16) {
-      window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
-    } else {
-      setTimeout(() => {
-        alert('Vielen Dank für Ihre Mitarbeit! Auf Ihrem Desktop wurden folgende PDF abgelegt:  Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com oder bringen Sie sie ausgedruckt zu Ihrem Besuch bei uns mit. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!');
-      }, 2000);
+    if (state.dizzinessDuration) {
+        doc.text('Schwindel seit: ' + state.dizzinessDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Schwindelintensität: ' + state.dizzinessIntensity, 10, yPosition);
+        yPosition += 10;
     }
-  }, 5000);
+
+    if (state.tinnitusDuration) {
+        doc.text('Ohrgeräusche/Tinnitus seit: ' + state.tinnitusDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Ohr: ' + state.tinnitusEar, 10, yPosition);
+        yPosition += 10;
+        doc.text('Tinnitusintensität: ' + state.tinnitusIntensity, 10, yPosition);
+        yPosition += 10;
+    }
+
+    if (state.hearingLossDuration) {
+        doc.text('Hörprobleme seit: ' + state.hearingLossDuration, 10, yPosition);
+        yPosition += 10;
+        doc.text('Ohr: ' + state.hearingLossEar, 10, yPosition);
+        yPosition += 10;
+        doc.text('Hörproblemeintensität: ' + state.hearingLossIntensity, 10, yPosition);
+        yPosition += 10;
+    }
+
+    if (state.weightLoss !== null && state.weightLoss !== 'nein') {
+        doc.text('Unfreiwilliger Gewichtsverlust: ' + state.weightLoss, 10, yPosition);
+        yPosition += 10;
+        if (state.weightLossAmount !== null) {
+            doc.text('Details zum Gewichtsverlust: ' + state.weightLossAmount, 10, yPosition);
+            yPosition += 10;
+        }
+    }
+
+    doc.text('Testergebnisse:', 10, yPosition);
+    yPosition += 10;
+
+    frequencies.forEach(freq => {
+        doc.text(`Frequenz ${freq} Hz - Rechts: ${results.right[freq] || 'N/A'} dB, Links: ${results.left[freq] || 'N/A'} dB`, 10, yPosition);
+        yPosition += 10;
+    });
+
+    doc.text('Sprachverständnis-Test Punktzahl: ' + state.initialTestScore + ' von ' + numWords, 10, yPosition);
+    yPosition += 10;
+    doc.text('Sprachverständnis im Störschall Punktzahl: ' + state.hearingTestScore + ' von ' + testWords.length, 10, yPosition);
+    yPosition += 20;
+
+    // Wait for the chart to render
+    setTimeout(() => {
+        html2canvas(document.querySelector("#resultsChart")).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 10, yPosition, 180, 100);
+
+            // Add the conversation to the PDF
+            yPosition += 110;
+            doc.text('Chatbot Konversation:', 10, yPosition);
+            yPosition += 10;
+            conversation.forEach((msg, index) => {
+                const text = `${msg.role === 'user' ? 'User' : 'Doktor'}: ${msg.content}`;
+                doc.text(text, 10, yPosition);
+                yPosition += 10;
+                if (yPosition > 280) { // Add new page if the content is too long
+                    doc.addPage();
+                    yPosition = 10;
+                }
+            });
+
+            doc.save('Anamnese_und_Testergebnisse.pdf');
+
+            // Weiterleitungen basierend auf den Ergebnissen
+            setTimeout(() => {
+                if (state.voiceAnalysisRecommended) {
+                    window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+                } else if (state.age > 6 && state.age < 16) {
+                    window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
+                } else {
+                    setTimeout(() => {
+                        alert('Vielen Dank für Ihre Mitarbeit! Auf Ihrem Desktop wurden folgende PDF abgelegt: Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!');
+                    }, 5000);
+                }
+            }, 5000);
+        });
+    }, 1000);  // Wartezeit, um sicherzustellen, dass die Grafik gerendert ist
 }
