@@ -281,7 +281,7 @@ async function getDoctorResponse(userInput) {
             }
             const anamnesis = createAnamnesis();
             const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-            return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+            return `Vielen Dank für die Informationen. Einen kleinen Moment! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
         }
 
         if (state.reason.includes('schmerzen')) {
@@ -302,7 +302,7 @@ async function getDoctorResponse(userInput) {
 
     const anamnesis = createAnamnesis();
     const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-    return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+    return `Vielen Dank für die Informationen. Einen kleinen Moment! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
 }
 
 function updateUrgency(duration, intensity, isChild = false) {
@@ -907,7 +907,7 @@ function saveResultsAsPDF() {
                     window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
                 } else {
                     setTimeout(() => {
-                        alert('Vielen Dank für Ihre Mitarbeit! Auf Ihrem Desktop wurden folgende PDF abgelegt: Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!');
+                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: Anamnese und Testergebnisse.pdf. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
                     }, 5000);
                 }
             }, 5000);

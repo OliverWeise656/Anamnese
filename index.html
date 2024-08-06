@@ -113,15 +113,15 @@
 
     <div id="tone-setting" class="hidden">
         <h1>Ton-Einstellung</h1>
-        <p>Für die folgenden Tests ist es notwendig Ihren Ton einzustellen. Begeben Sie sich hierzu in eine ruhige Umgebung. Nutzen Sie am besten einen Kopfhörer. Wenn Sie den Test mit Hörgeräten oder mit Ihrem Kind zusammen machen, dann können Sie auch den Lautsprecher Ihres Rechners benutzen, um zu hören, was Ihr Kind nachsprechen oder als gehört anzeigen soll:</p>
-        <p>Nach dem Drücken von "Start" hören Sie einen Ton, stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass der Patient den Ton gerade noch hören können. Wenn Sie fertig sind drücken Sie "Stopp".</p>
+        <p>Für die folgenden Tests ist es notwendig, Ihren Ton einzustellen. Gehen Sie dazu bitte in eine ruhige Umgebung und nutzen Sie am besten einen Kopfhörer. Wenn Sie den Test mit Hörgeräten durchführen oder gemeinsam mit Ihrem Kind machen, können Sie auch den Lautsprecher Ihres Rechners verwenden, um zu hören, was Ihr Kind nachsprechen oder als gehört anzeigen soll.</p>
+        <p>Nach dem Drücken von „Start“ hören Sie einen Ton. Stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass der Patient den Ton gerade noch hören kann. Wenn Sie fertig sind, drücken Sie „Stopp“.</p>
         <button id="startButton">Start</button>
         <button id="stopButton" disabled>Stopp</button>
     </div>
 
     <div id="initial-test" class="hidden">
-        <h1 id="initial-test-heading">Sprachverständnis-Test - tragen Sie das gehörte Wort in das vorgesehene Feld ein. Sollten Sie das Wort nicht verstanden haben, so tragen Sie nichts in das Feld ein und bestätigen ohne Eintrag.</h1>
-        <p id="initial-instructions">Drücke den Button, um den Test zu starten.</p>
+        <h1 id="initial-test-heading">Sprachverständnis-Test: Tragen Sie das gehörte Wort in das dafür vorgesehene Feld ein. Wenn Sie das Wort nicht verstehen, lassen Sie das Feld bitte leer und bestätigen Sie ohne Eintrag.</h1>
+        <p id="initial-instructions">Bitte drücken Sie den Button, um den Test zu starten.</p>
         <button id="start-initial-test-button">Test starten</button>
         <div id="test-area">
             <p id="audio-instruction"></p>
@@ -133,7 +133,7 @@
 
     <div id="hearing-test-info" class="hidden">
         <h1>Sprachverständnis im Störschall</h1>
-        <p>In diesem Test werden Ihnen Wörter im Hintergrundrauschen vorgespielt. Ihre Aufgabe ist es, das gehörte Wort in das Textfeld einzugeben.Sollten Sie das Wort nicht verstanden haben, so tragen Sie nichts in das Feld ein und bestätigen ohne Eintrag.</p>
+        <p>Während dieses Tests werden Ihnen Wörter im Hintergrundrauschen vorgespielt. Ihre Aufgabe besteht darin, das gehörte Wort in das Textfeld einzugeben. Falls Sie das Wort nicht verstanden haben, lassen Sie das Feld einfach leer und bestätigen ohne Eintrag.</p>
         <button id="start-hearing-test-button">Test starten</button>
     </div>
 
@@ -147,11 +147,11 @@
     <div id="hearing-test" class="hidden">
         <h1>Hörtest</h1>
         <div id="instructions">
-            <p>Sie werden auf jeder Seite 6 Töne hören. Zuerst wird das rechte Ohr getestet. Drücken Sie den Knopf, wenn Sie den Ton hören.</p>
+            <p>Auf jeder Seite werden Sie sechs Töne hören. Zuerst wird Ihr rechtes Ohr getestet. Bitte drücken Sie den Knopf, sobald Sie einen Ton wahrnehmen.</p>
             <button onclick="startTest('right')">Rechtes Ohr Testen</button>
         </div>
         <div id="right-test-done" class="hidden">
-            <p>Der Test des rechten Ohres ist abgeschlossen. Jetzt das linke Ohr testen.</p>
+            <p>Der Hörtest für das rechte Ohr ist abgeschlossen. Nun folgt der Test für das linke Ohr.</p>
             <button onclick="startTest('left')">Linkes Ohr Testen</button>
         </div>
         <div id="test-area">
