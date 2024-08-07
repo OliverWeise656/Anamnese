@@ -64,7 +64,7 @@ async function sendMessage() {
             if (state.hearingTestRecommended) {
                 startToneSetting();
             } else if (state.voiceAnalysisRecommended) {
-                window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+                window.location.href = 'https://voice-handicap-index.glitch.me';
             }
         }, 9000); // 10 Sekunden Verzögerung
     }
@@ -928,7 +928,7 @@ function saveResultsAsPDF() {
             // Weiterleitungen basierend auf den Ergebnissen
             setTimeout(() => {
                 if (state.voiceAnalysisRecommended) {
-                    window.location.href = 'https://classic-broadleaf-blender.glitch.me';
+                    window.location.href = 'https://voice-handicap-index.glitch.me';
                 } else if (state.age > 6 && state.age < 16) {
                     window.location.href = 'https://mottier-test.glitch.me';
                 } else {
