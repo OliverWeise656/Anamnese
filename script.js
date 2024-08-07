@@ -933,7 +933,7 @@ function saveResultsAsPDF() {
                     window.location.href = 'https://sulky-equal-cinnamon.glitch.me';
                 } else {
                     setTimeout(() => {
-                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Bitte senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com oder bringen Sie sie ausgedruckt zu Ihrem Besuch bei uns mit. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
+                        alert('Herzlichen Dank für Ihre Zusammenarbeit! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Bitte bringen Sie diese ausgedruckt zu Ihrem Besuch mit oder senden Sie diese unter dem BETREFF "TerminWeise" mit Datum und Uhrzeit Ihres Besuchs an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei!');
                     }, 5000);
                 }
             }, 5000);
