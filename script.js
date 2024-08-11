@@ -281,7 +281,7 @@ async function getDoctorResponse(userInput) {
             }
             const anamnesis = createAnamnesis();
             const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-            return `Vielen Dank für die Informationen. Einen kleinen Moment! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+            return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
         }
 
         if (state.reason.includes('schmerzen')) {
@@ -302,7 +302,7 @@ async function getDoctorResponse(userInput) {
 
     const anamnesis = createAnamnesis();
     const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-    return `Vielen Dank für die Informationen. Einen kleinen Moment! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+    return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
 }
 
 function updateUrgency(duration, intensity, isChild = false) {
