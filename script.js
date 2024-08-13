@@ -659,7 +659,7 @@ function startHearingTestProcess() {
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -60; // Startlautstärke auf -40 dB setzen
+let currentDb = -50; // Startlautstärke auf -40 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
 
@@ -695,7 +695,7 @@ function startToneHearingTest() {
 }
 
 function increaseVolume() {
-  currentDb = -60; // Startlautstärke auf -40 dB setzen
+  currentDb = -50; // Startlautstärke auf -40 dB setzen
   let increaseInterval = setInterval(() => {
     if (currentDb < 90) {
       currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
@@ -739,8 +739,8 @@ function displayResults() {
 
 function renderChart() {
   const ctx = document.getElementById('resultsChart').getContext('2d');
-  const rightData = frequencies.map(freq => results.right[freq] !== undefined ? results.right[freq] + 60 : null);
-  const leftData = frequencies.map(freq => results.left[freq] !== undefined ? results.left[freq] + 60 : null);
+  const rightData = frequencies.map(freq => results.right[freq] !== undefined ? results.right[freq] + 50 : null);
+  const leftData = frequencies.map(freq => results.left[freq] !== undefined ? results.left[freq] + 50 : null);
 
   new Chart(ctx, {
     type: 'line',
