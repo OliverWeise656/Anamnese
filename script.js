@@ -933,7 +933,7 @@ function saveResultsAsPDF() {
                     window.location.href = 'https://mottier-test.glitch.me';
                 } else {
                     setTimeout(() => {
-                        alert('Herzlichen Dank für Ihre Unterstützung! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei! Bitte Beachten Sie, dass das Ergebnis des Hörtests besonderer Interpretation bedarf und nur für den Gebrauch in unserer Praxis vorgesehen ist.');
+                        alert('Herzlichen Dank für Ihre Unterstützung! Auf Ihrem Desktop wurde die folgende PDF abgelegt: ' + fileName + '. Bitte bringen Sie diese ausgedruckt zu Ihrem Besuch bei uns mit. Auf diese Weise tragen Sie zu einem reibungslosen Ablauf Ihres Besuchs bei uns bei! Bitte Beachten Sie, dass das Ergebnis des Hörtests besonderer Interpretation bedarf und nur für den Gebrauch in unserer Praxis vorgesehen ist.');
                     }, 5000);
                 }
             }, 5000);
