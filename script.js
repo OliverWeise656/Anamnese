@@ -703,7 +703,7 @@ function increaseVolume() {
     } else {
       clearInterval(increaseInterval);
     }
-  }, 800);  // Erhöhungsintervall auf 1 Sekunde setzen
+  }, 500);  // Erhöhungsintervall auf 1 Sekunde setzen
 }
 
 function heardTone() {
