@@ -913,8 +913,10 @@ function saveResultsAsPDF() {
             // Add the summary to the PDF
             yPosition += 110;
             const summary = generateSummary();
-            doc.text('Zusammenfassung der Chatbot Konversation:', 10, yPosition);
+            doc.text('Hinweis: Das Ergebnis des Hörtests muss von unserer Praxis bewertet werden und kann nicht direkt übernommen werden. Bitte bringen Sie die ausgedruckten Testergebnisse zu Ihrem Termin in unserer Praxis mit. Zusammenfassung der Chatbot Konversation:', 10, yPosition);
             yPosition += 10;
+            doc.text('und kann nicht direkt übernommen werden')
+             yPosition += 10;
             doc.text(summary, 10, yPosition);
 
             // Datum und Uhrzeit für den Dateinamen hinzufügen
