@@ -925,8 +925,14 @@ function saveResultsAsPDF() {
             yPosition += 10;
             doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit.', 10, yPosition);
             yPosition += 10;
-            doc.text('Bitte Prüfen Sie, ob in einem anderen Fenster noch weitere Hörtests durchzuführen sind.', 10, yPosition);
-            yPosition += 10;
+            
+          // Set text color to red
+           doc.setTextColor(255, 0, 0);  // RGB color for red
+           doc.text('Bitte Prüfen Sie, ob in einem anderen Fenster noch weitere Hörtests durchzuführen sind.', 10, yPosition);
+           yPosition += 10;
+
+         // Reset text color to black (or any other default color you want)
+            doc.setTextColor(0, 0, 0);  // RGB color for black
             doc.text('Chatbot-Konversation', 10, yPosition);
             yPosition += 10;
             doc.text(summary, 10, yPosition);
