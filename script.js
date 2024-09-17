@@ -225,7 +225,7 @@ async function getDoctorResponse(userInput) {
 
         if (state.age >= 7 && state.school === null) {
             state.school = userInput.toLowerCase();
-            return 'Was für eine Art von Schule besucht das Kind?';
+            return 'Was für eine Art von Schule und welche Klasse besucht das Kind?';
         }
 
         if (state.school !== null && state.schoolType === null) {
