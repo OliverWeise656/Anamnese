@@ -852,8 +852,9 @@ function generateSummary() {
 function saveResultsAsPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-
-    doc.text('Anamnese und Testergebnisse', 10, 10);
+    doc.setFontSize(9);  // Ändere '12' auf die gewünschte Schriftgröße
+    
+  doc.text('Anamnese und Testergebnisse', 10, 10);
     doc.text('Alter des Patienten: ' + state.age, 10, 20);
     doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
 
@@ -917,7 +918,7 @@ function saveResultsAsPDF() {
             yPosition += 10;
             doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
             yPosition += 10;
-            doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit.', 10, yPosition);
+            doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Bitte Prüfen Sie, ob in einem anderen Fenster noch weitere Hörtests durchzuführen sind.', 10, yPosition);
             yPosition += 10;
             doc.text('Chatbot-Konversation', 10, yPosition);
             yPosition += 10;
