@@ -66,7 +66,7 @@ async function sendMessage() {
             } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://voice-handicap-index.glitch.me';
             }
-        }, 13000); // 10 Sekunden Verzögerung
+        }, 10000); // Verzögerung bis zur Weiterleitung nach Chatbot-Abfrage
     }
 }
 
@@ -845,7 +845,12 @@ function generateSummary() {
             summary += `Details zum Gewichtsverlust: ${state.weightLossAmount}\n`;
         }
     }
-    return summary;
+   // Hier wird die Information zur Quelle der Überweisung hinzugefügt
+    if (state.referralSource !== null) {
+        summary += `Von wem wurde der Patient geschickt: ${state.referralSource}\n`;
+    }  
+  
+  return summary;
 }
 
 
@@ -918,7 +923,9 @@ function saveResultsAsPDF() {
             yPosition += 10;
             doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
             yPosition += 10;
-            doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Bitte Prüfen Sie, ob in einem anderen Fenster noch weitere Hörtests durchzuführen sind.', 10, yPosition);
+            doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit.', 10, yPosition);
+            yPosition += 10;
+            doc.text('Bitte Prüfen Sie, ob in einem anderen Fenster noch weitere Hörtests durchzuführen sind.', 10, yPosition);
             yPosition += 10;
             doc.text('Chatbot-Konversation', 10, yPosition);
             yPosition += 10;
