@@ -98,9 +98,9 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Schwindel?';
         } else if (state.reason.includes('ohrgeräusche') || state.reason.includes('tinnitus') || state.reason.includes('ohrrauschen') || state.reason.includes('ohrensausen') || state.reason.includes('geräusche im ohr')) {
             return 'Wie lange haben Sie schon Ohrgeräusche/Tinnitus?';
-        } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
+        } else if (state.reason.includes('hör') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
             return 'Wie lange haben Sie schon Hörprobleme?';
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schlucken') || state.reason.includes('schluck')|| state.reason.includes('gewichtsverlust')) {
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('kratz') || state.reason.includes('schluck')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
         } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimme')|| state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || state.reason.includes('Probleme mit dem Singen') ) {
             state.voiceAnalysisRecommended = true;
@@ -157,7 +157,7 @@ async function getDoctorResponse(userInput) {
                 updateUrgency(state.tinnitusDuration, state.tinnitusIntensity);
                 return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
             }
-        } else if (state.reason.includes('hören') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
+        } else if (state.reason.includes('hör') || state.reason.includes('hörverlust') || state.reason.includes('hörstörung') || state.reason.includes('hörproblem') || state.reason.includes('schwerhörig') || state.reason.includes('schlechtes hören') || state.reason.includes('höre schlecht')) {
             state.hearingTestRecommended = true;
             if (state.hearingLossDuration === null) {
                 state.hearingLossDuration = userInput.toLowerCase();
@@ -177,7 +177,7 @@ async function getDoctorResponse(userInput) {
                 updateUrgency(state.hearingLossDuration, state.hearingLossIntensity);
                 return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
             }
-        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schluck') || state.reason.includes('schluckprobleme') || state.reason.includes('gewichtsverlust') || state.reason.includes('schluckstörungen') ) {
+        } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('schluck') || state.reason.includes('kratz') || state.reason.includes('gewichtsverlust') || state.reason.includes('schluckstörungen') ) {
     if (state.weightLoss === null) {
         state.weightLoss = userInput.toLowerCase();
         if (state.weightLoss === 'ja') {
@@ -946,7 +946,7 @@ function saveResultsAsPDF() {
             setTimeout(() => {
                 if (state.voiceAnalysisRecommended) {
                     window.location.href = 'https://voice-handicap-index.glitch.me';
-                } else if (state.age > 6 && state.age < 16) {
+                } else if (state.age > 4 && state.age < 16) {
                     window.location.href = 'https://mottier-test.glitch.me';
                 } else {
                     setTimeout(() => {
