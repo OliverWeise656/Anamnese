@@ -569,16 +569,16 @@ function showInitialResult() {
 
 // Sprachverständnis im Störschall Test
 const audioFiles = [
-  {name: 'Baum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Baum.mp3?v=1722797060707', snr: 18},
-  {name: 'brav', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/brav.mp3?v=1722797061079', snr: 16},
-  {name: 'Dach', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Dach.mp3?v=1722797061903', snr: 14},
-  {name: 'Fass', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Fass.mp3?v=1722797062217', snr: 12},
-  {name: 'Hund', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Hund.mp3?v=1722797062618', snr: 10},
-  {name: 'klein', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/klein.mp3?v=1722797062953', snr: 9},
-  {name: 'laut', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/laut.mp3?v=1722797063534', snr: 8},
-  {name: 'Mann', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Mann.mp3?v=1722797063863', snr: 7},
-  {name: 'nass', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/nass.mp3?v=1722797064447', snr: 6},
-  {name: 'Raum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/Raum.mp3?v=1722797064765', snr: 5}
+  {name: 'Baum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/15%20Baum.mp3?v=1727960867842', snr: 15},
+  {name: 'brav', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/14%20brav.mp3?v=1727960864800', snr: 14},
+  {name: 'Dach', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/13%20Dach.mp3?v=1727960861069', snr: 13},
+  {name: 'Fass', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/12%20Fass.mp3?v=1727960856627', snr: 12},
+  {name: 'Hund', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/11%20Hund.mp3?v=1727960847930', snr: 11},
+  {name: 'klein', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/10%20klein.mp3?v=1727960844776', snr: 10},
+  {name: 'laut', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/9%20laut.mp3?v=1727960842065', snr: 9},
+  {name: 'Mann', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/8%20Mann.mp3?v=1727960839038', snr: 8},
+  {name: 'nass', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/7%20nass.mp3?v=1727960834964', snr: 7},
+  {name: 'Raum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/6%20Raum.mp3?v=1727960831539', snr: 6}
 ];
 
 let testWords = [];
