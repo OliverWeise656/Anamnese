@@ -569,6 +569,8 @@ function showInitialResult() {
 
 // Sprachverständnis im Störschall Test
 const audioFiles = [
+  {name: 'Saal', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/17%20Saal.mp3?v=1727961719733', snr: 17},
+  {name: 'Zahn', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/16%20Zahn.mp3?v=1727961724270', snr: 16},
   {name: 'Baum', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/15%20Baum.mp3?v=1727960867842', snr: 15},
   {name: 'brav', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/14%20brav.mp3?v=1727960864800', snr: 14},
   {name: 'Dach', url: 'https://cdn.glitch.global/277d0540-fab3-4721-89e5-e493d6206e82/13%20Dach.mp3?v=1727960861069', snr: 13},
