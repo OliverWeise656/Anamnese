@@ -916,6 +916,8 @@ function saveResultsAsPDF() {
             // Add the summary to the PDF
             yPosition += 110;
             const summary = generateSummary();
+            doc.text('Praxis Drs. Avelini Weise Rittenauer.', 10, yPosition);
+            yPosition += 10; 
             doc.text('Hinweis: Das Ergebnis des Hörtests muss von unserer Praxis bewertet werden.', 10, yPosition);
             yPosition += 10;
             doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
