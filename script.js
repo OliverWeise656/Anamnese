@@ -916,13 +916,17 @@ function saveResultsAsPDF() {
             // Add the summary to the PDF
             yPosition += 110;
             const summary = generateSummary();
-            doc.text('Praxis Drs. Avelini Weise Rittenauer.', 10, yPosition);
+            doc.text('Copyright 2024, Dr. Oliver Weise.', 10, yPosition);
             yPosition += 10; 
-            doc.text('Hinweis: Das Ergebnis des Hörtests muss von unserer Praxis bewertet werden.', 10, yPosition);
-            yPosition += 10;
+            doc.text('Die Nutzung des Hörtests ist ausschließlich unter Anerkennung der geltenden Nutzungsbedingungen gestattet.', 10, yPosition);
+            yPosition += 5; 
+            doc.text('Das Ergebnis des Hörtests wird ausschließlich von unserer Praxis ausgewertet.', 10, yPosition);
+            yPosition += 5;
+            doc.text('Eine Weitergabe an und Nutzung durch Dritte ist nicht gestattet.', 10, yPosition);
+            yPosition += 10; 
             doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
             yPosition += 10;
-            doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit.', 10, yPosition);
+            doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Speichern Sie es auf Ihrem Handy.', 10, yPosition);
             yPosition += 10;
             
           // Set text color to red
