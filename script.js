@@ -924,7 +924,7 @@ function saveResultsAsPDF() {
             yPosition += 5;
             doc.text('Eine Weitergabe an und Nutzung durch Dritte ist nicht gestattet.', 10, yPosition);
             yPosition += 10; 
-            doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
+            doc.text('Die Ergebnisse können nicht direkt verwendet werden. Es bedarf einer Interpretation durch uns.', 10, yPosition);
             yPosition += 10;
             doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Speichern Sie es auf Ihrem Handy.', 10, yPosition);
             yPosition += 10;
