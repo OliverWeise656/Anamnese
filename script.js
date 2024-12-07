@@ -5,6 +5,7 @@ const spreadsheetId = '1GRPTS1oa3rAdapYTaCg01ZOHDKKxQJ8T9doeSF_HGrA'; // Ihre Go
 let conversation = [
     { role: 'system', content: 'Alter des Patienten:' }
 ];
+let redirectTimeout; // Variable für den Timeout
 
 let state = {
     age: null,
@@ -55,20 +56,29 @@ async function sendMessage() {
     addMessageToChat('Doktor', doctorMessage);
     conversation.push({ role: 'assistant', content: doctorMessage });
 
-    // Hier speichern wir die Anamnese-Daten
     await appendRow([userInput, doctorMessage, new Date().toLocaleString()]);
 
-    // Überprüfen Sie, ob eine Weiterleitung erforderlich ist
     if (state.hearingTestRecommended || state.voiceAnalysisRecommended) {
-        setTimeout(() => {
+        const proceedToNextStep = () => {
             if (state.hearingTestRecommended) {
                 startToneSetting();
             } else if (state.voiceAnalysisRecommended) {
                 window.location.href = 'https://voice-handicap-index.glitch.me';
             }
-        }, 10000); // Verzögerung bis zur Weiterleitung nach Chatbot-Abfrage
+        };
+
+        redirectTimeout = setTimeout(proceedToNextStep, 10000);
+
+        const skipButton = document.getElementById('skipButton');
+        if (skipButton) {
+            skipButton.addEventListener('click', () => {
+                clearTimeout(redirectTimeout);
+                proceedToNextStep();
+            });
+        }
     }
 }
+
 
 async function getDoctorResponse(userInput) {
     if (state.age === null) {
@@ -225,7 +235,7 @@ async function getDoctorResponse(userInput) {
 
         if (state.age >= 7 && state.school === null) {
             state.school = userInput.toLowerCase();
-            return 'Was für eine Art von Schule und welche Klasse besucht das Kind?';
+            return 'Welche Klasse und welche Art Schule besucht das Kind?';
         }
 
         if (state.school !== null && state.schoolType === null) {
@@ -244,7 +254,7 @@ async function getDoctorResponse(userInput) {
                 return 'Wie viele Geschwister hat das Kind?';
             } else {
                 state.siblings = false;
-                return 'Wer hat die Familie geschickt?';
+                return 'Wer hat die Familie geschickt (z.B. Kinderarzt, Lehrer etc.)?';
             }
         }
 
@@ -281,7 +291,7 @@ async function getDoctorResponse(userInput) {
             }
             const anamnesis = createAnamnesis();
             const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-            return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+            return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
         }
 
         if (state.reason.includes('schmerzen')) {
@@ -302,7 +312,7 @@ async function getDoctorResponse(userInput) {
 
     const anamnesis = createAnamnesis();
     const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-    return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+    return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
 }
 
 function updateUrgency(duration, intensity, isChild = false) {
@@ -391,7 +401,7 @@ function createAnamnesis() {
 
 function getAdditionalRecommendations(reason, age) {
     let recommendation = '';
-    if (age > 4) {
+    if (age > 3) {
         state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest durchzuführen.';
     }
@@ -854,7 +864,7 @@ function generateSummary() {
 function saveResultsAsPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFontSize(9);  // Ändere '12' auf die gewünschte Schriftgröße
+    doc.setFontSize(7);  // Ändere '12' auf die gewünschte Schriftgröße
     
   doc.text('Anamnese und Testergebnisse', 10, 10);
     doc.text('Alter des Patienten: ' + state.age, 10, 20);
@@ -924,7 +934,7 @@ function saveResultsAsPDF() {
             yPosition += 5;
             doc.text('Eine Weitergabe an und Nutzung durch Dritte ist nicht gestattet.', 10, yPosition);
             yPosition += 10; 
-            doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
+            doc.text('Das Ergebnis kann nicht direkt verwendet werden. Es bedarf der Interpretation', 10, yPosition);
             yPosition += 10;
             doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Speichern Sie es auf Ihrem Handy.', 10, yPosition);
             yPosition += 10;
@@ -936,9 +946,8 @@ function saveResultsAsPDF() {
 
          // Reset text color to black (or any other default color you want)
             doc.setTextColor(0, 0, 0);  // RGB color for black
-            doc.text('Chatbot-Konversation', 10, yPosition);
-            yPosition += 10;
-            doc.text(summary, 10, yPosition);
+            
+           doc.text(summary, 10, yPosition);
 
             // Datum und Uhrzeit für den Dateinamen hinzufügen
             const now = new Date();
