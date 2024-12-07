@@ -864,14 +864,21 @@ function generateSummary() {
 function saveResultsAsPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFontSize(7);  // Ändere '12' auf die gewünschte Schriftgröße
+    doc.setFontSize(9);  // Ändere '12' auf die gewünschte Schriftgröße
     
-  doc.text('Anamnese und Testergebnisse', 10, 10);
-    doc.text('Alter des Patienten: ' + state.age, 10, 20);
-    doc.text('Grund des Besuchs: ' + state.reason, 10, 30);
+  let yPosition = 10; // Initiale Y-Position
 
-    let yPosition = 40;
-
+    // Zeitstempel hinzufügen
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    doc.text(`Zeitstempel: ${dateStr} ${timeStr}`, 10, yPosition);
+    yPosition += 10;
+  
+// Testergebnisse
+    doc.text('Testergebnisse:', 10, yPosition);
+    yPosition += 10;
+  
     if (state.painDuration) {
         doc.text('Schmerzen seit: ' + state.painDuration, 10, yPosition);
         yPosition += 10;
@@ -934,7 +941,7 @@ function saveResultsAsPDF() {
             yPosition += 5;
             doc.text('Eine Weitergabe an und Nutzung durch Dritte ist nicht gestattet.', 10, yPosition);
             yPosition += 10; 
-            doc.text('Das Ergebnis kann nicht direkt verwendet werden. Es bedarf der Interpretation', 10, yPosition);
+            doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
             yPosition += 10;
             doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Speichern Sie es auf Ihrem Handy.', 10, yPosition);
             yPosition += 10;
@@ -946,8 +953,9 @@ function saveResultsAsPDF() {
 
          // Reset text color to black (or any other default color you want)
             doc.setTextColor(0, 0, 0);  // RGB color for black
-            
-           doc.text(summary, 10, yPosition);
+            doc.text('Chatbot-Konversation', 10, yPosition);
+            yPosition += 10;
+            doc.text(summary, 10, yPosition);
 
             // Datum und Uhrzeit für den Dateinamen hinzufügen
             const now = new Date();
