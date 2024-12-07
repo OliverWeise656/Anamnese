@@ -281,7 +281,7 @@ async function getDoctorResponse(userInput) {
             }
             const anamnesis = createAnamnesis();
             const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-            return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+            return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
         }
 
         if (state.reason.includes('schmerzen')) {
@@ -302,7 +302,7 @@ async function getDoctorResponse(userInput) {
 
     const anamnesis = createAnamnesis();
     const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-    return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+    return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
 }
 
 function updateUrgency(duration, intensity, isChild = false) {
@@ -628,18 +628,24 @@ function nextHearingWord() {
 }
 
 function showFinalResult() {
-  document.getElementById('test').style.display = 'none';
-  document.getElementById('final-result').style.display = 'block';
-  document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
-  setTimeout(() => {
-    document.getElementById('final-result').style.display = 'none';
-    startHearingTestProcess();
-  }, 3000);
+    document.getElementById('test').style.display = 'none';
+    document.getElementById('final-result').style.display = 'block';
+    document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
+
+    // Weiterleitung wird durch den Button "Weiter" gesteuert
+    document.getElementById('continueButton').addEventListener('click', startHearingTestProcess);
 }
 
+
 function startHearingTestProcess() {
-  document.getElementById('hearing-test').style.display = 'block';
+    // Beispiel für die nächste Aktion (angepasst an den bestehenden Workflow)
+    if (state.hearingTestRecommended) {
+        document.getElementById('hearing-test').style.display = 'block';
+    } else {
+        window.location.href = 'https://voice-handicap-index.glitch.me';
+    }
 }
+
 
 // Call showHearingTestInfo() after the initial test is completed
 function showInitialResult() {
