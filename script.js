@@ -102,7 +102,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Hörprobleme?';
         } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('ess') || state.reason.includes('schluck')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
-        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('kratz') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimm')|| state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || state.reason.includes('Probleme mit dem Singen') ) {
+        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('kratz') || state.reason.includes('heiser') || state.reason.includes('kehlkopf') || state.reason.includes('stimm')|| state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || state.reason.includes('Probleme mit dem Singen') ) {
             state.voiceAnalysisRecommended = true;
             return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
         }
@@ -395,7 +395,7 @@ function getAdditionalRecommendations(reason, age) {
         state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest durchzuführen.';
     }
-    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || state.reason.includes('kratz') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimm') || state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || reason.includes('singen')) {
+    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || state.reason.includes('kratz') || reason.includes('heiser') || reason.includes('kehlkopf') || reason.includes('stimm') || state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || reason.includes('singen')) {
         state.voiceAnalysisRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse durchzuführen.';
     }
