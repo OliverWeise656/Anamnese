@@ -102,7 +102,7 @@ async function getDoctorResponse(userInput) {
             return 'Wie lange haben Sie schon Hörprobleme?';
         } else if (state.reason.includes('schluckbeschwerden') || state.reason.includes('essstörungen') || state.reason.includes('ess') || state.reason.includes('schluck')|| state.reason.includes('gewichtsverlust')) {
             return 'Haben Sie unfreiwillig Gewicht verloren?';
-        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('kratz') || state.reason.includes('heiser') || state.reason.includes('kehlkopf') || state.reason.includes('stimm')|| state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || state.reason.includes('Probleme mit dem Singen') ) {
+        } else if (state.reason.includes('stimmstörung') || state.reason.includes('heiserkeit') || state.reason.includes('kratz') || state.reason.includes('heiser') || state.reason.includes('rauhe stimme') || state.reason.includes('stimm')|| state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || state.reason.includes('Probleme mit dem Singen') ) {
             state.voiceAnalysisRecommended = true;
             return 'Gibt es sonst noch etwas, das Sie uns mitteilen möchten?';
         }
@@ -281,7 +281,7 @@ async function getDoctorResponse(userInput) {
             }
             const anamnesis = createAnamnesis();
             const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-            return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+            return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
         }
 
         if (state.reason.includes('schmerzen')) {
@@ -302,7 +302,7 @@ async function getDoctorResponse(userInput) {
 
     const anamnesis = createAnamnesis();
     const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-    return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+    return `Vielen Dank für die Informationen. Einen kleinen Moment, Sie werden gleich weitergeleitet! Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
 }
 
 function updateUrgency(duration, intensity, isChild = false) {
@@ -395,7 +395,7 @@ function getAdditionalRecommendations(reason, age) {
         state.hearingTestRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, einen Hörtest durchzuführen.';
     }
-    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || state.reason.includes('kratz') || reason.includes('heiser') || reason.includes('kehlkopf') || reason.includes('stimm') || state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || reason.includes('singen')) {
+    if (reason.includes('stimmstörung') || reason.includes('heiserkeit') || state.reason.includes('kratz') || reason.includes('heiser') || reason.includes('rauhe stimme') || reason.includes('stimm') || state.reason.includes('stimmverlust') || state.reason.includes('phoniatrisches gutachten') || state.reason.includes('gutachten') || reason.includes('singen')) {
         state.voiceAnalysisRecommended = true;
         recommendation += ' Wir empfehlen Ihnen, eine Stimmanalyse durchzuführen.';
     }
@@ -628,24 +628,18 @@ function nextHearingWord() {
 }
 
 function showFinalResult() {
-    document.getElementById('test').style.display = 'none';
-    document.getElementById('final-result').style.display = 'block';
-    document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
-
-    // Weiterleitung wird durch den Button "Weiter" gesteuert
-    document.getElementById('continueButton').addEventListener('click', startHearingTestProcess);
+  document.getElementById('test').style.display = 'none';
+  document.getElementById('final-result').style.display = 'block';
+  document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
+  setTimeout(() => {
+    document.getElementById('final-result').style.display = 'none';
+    startHearingTestProcess();
+  }, 3000);
 }
-
 
 function startHearingTestProcess() {
-    // Beispiel für die nächste Aktion (angepasst an den bestehenden Workflow)
-    if (state.hearingTestRecommended) {
-        document.getElementById('hearing-test').style.display = 'block';
-    } else {
-        window.location.href = 'https://voice-handicap-index.glitch.me';
-    }
+  document.getElementById('hearing-test').style.display = 'block';
 }
-
 
 // Call showHearingTestInfo() after the initial test is completed
 function showInitialResult() {
@@ -930,7 +924,7 @@ function saveResultsAsPDF() {
             yPosition += 5;
             doc.text('Eine Weitergabe an und Nutzung durch Dritte ist nicht gestattet.', 10, yPosition);
             yPosition += 10; 
-            doc.text('Die Ergebnisse können nicht direkt verwendet werden. Es bedarf einer Interpretation durch uns.', 10, yPosition);
+            doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
             yPosition += 10;
             doc.text('Bringen Sie es ausgedruckt zu Ihrem Besuch bei uns mit. Speichern Sie es auf Ihrem Handy.', 10, yPosition);
             yPosition += 10;

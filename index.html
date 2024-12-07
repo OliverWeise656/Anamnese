@@ -107,26 +107,19 @@
 <body>
     <div id="chatbot">
         <h1><span style="color: blue;">Ihre Buchung war erfolgreich!</span></h1>
-        <p>Um Ihren Praxisbesuch effizienter zu gestalten und dem Personalmangel zu begegnen, bieten wir die folgenden Online-Tests an.</p>
-        <p>Bitte beantworten Sie, die nachfolgenden Fragen stichwortartig, und führen Sie die vorgeschlagenen Tests nach bestem Können durch. 
- <p><span style="color: red;">Bringen Sie die Ergebnisse ausgedruckt zum Termin in die Praxis mit.</span><p>(Dauer max. 10 min.)<p><p>Falls es zeitlich nicht passt oder zu anstrengend wird, erhalten Sie über einen Link in den Erinnerungsmails die Möglichkeit die Tests zu einem späteren Zeitpunkt zu ergänzen.<p><span style="color: red;">Unabhängig von Ihrer eigenen Einschätzung sind die vom Chatbot vorgeschlagenen Tests für Sie und uns wichtig!</span></p><p><span style="color: blue;">Ihre Vorteile:</span>
-
-Weniger Zeitaufwand in der Praxis,
-Bessere Verlaufskontrollen,
-Übungsmöglichkeit für Kinder,
-Wichtige Referenzwerte für die Zukunft,
-das Hörvermögen ist bei Stimmproblemen wichtig.<p>  <span style="color: red;">Die Hörtests helfen uns sehr und können Ihnen einen Folgetermin ersparen. Wenn es jedoch nicht klappt, ist das kein Problem!
+        <p>Eine Bestätigungsmail ist bereits auf dem Weg zu Ihnen. <p>(Schauen Sie auch in Ihrem SPAM Ordner).</p>
+        <p>Wir bitten Sie dringend, die nachfolgenden Fragen stichwortartig zu beantworten, die vorgeschlagenen Tests nach bestem Können durchzuführen, 
+ <p><span style="color: red;">und die Ergebnisse ausgedruckt zum Termin in die Praxis mitzubringen.</span><p>(Dauer max. 10 min.)<p>Alternativ können Sie die Tests zu einem späteren Zeitpunkt über den Link in Ihrer Bestätigungmail durchführen.<p>  <span style="color: red;"> Bitte beachten Sie, dass wir Sie ohne diese Tests u.U. nicht vollständig behandeln können und einen weiteren Termin benötigen.
 </span>
         <p><span style="color: green;">Falls der Patient jünger als 4 Jahre ist, brauchen Sie die Fragen nicht zu beantworten und die Tests nicht durchzuführen.</span></p>
         <p><span style="color: red;">Geben Sie zunächst das Alter des Patienten ein:</span></p>
         <div id="messages"></div>
         <input type="text" id="userInput" placeholder="Ihre Nachricht...">
-        <button onclick="sendMessage()">Weiter</button>
+        <button onclick="sendMessage()">Senden</button>
     </div>
 
     <div id="tone-setting" class="hidden">
         <h1>Ton-Einstellung</h1>
-      <p><span style="color: red;">Falls Sie "nur" wegen Stimmstörungen oder einem anderen Grund kommen, machen Sie dennoch diesen Hörtest. Dieser dient uns als Referenzwert.</span> <p>
         <p>Für die folgenden Tests ist es notwendig, Ihren Ton einzustellen. Gehen Sie dazu bitte in eine ruhige Umgebung und nutzen Sie am besten einen Kopfhörer. Wenn Sie den Test mit Hörgeräten durchführen oder gemeinsam mit Ihrem Kind machen, können Sie auch den Lautsprecher Ihres Rechners verwenden, um zu hören, was Ihr Kind nachsprechen oder als gehört anzeigen soll.</p>
         <p>Nach dem Drücken von „Start“ hören Sie einen Ton. Stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass der Patient den Ton gerade noch hören kann. <p>Falls Sie ohne Kopfhörer arbeiten, stellen Sie den Ton etwas lauter ein. <p>Wenn Sie die Einstellung beendet haben, drücken Sie „Stopp“. <p>Es folgen dann zunächst 3 Hörtests.</p>
         <button id="startButton">Start</button>
@@ -177,12 +170,7 @@ das Hörvermögen ist bei Stimmproblemen wichtig.<p>  <span style="color: red;">
         </div>
     </div>
 
-    <div id="final-result" class="hidden">
-    <h1>Test beendet! Vielen Dank!</h1>
-    <p>Bitte klicken Sie auf "Weiter", um fortzufahren.</p>
-    <button id="continueButton">Weiter</button>
-</div>
-
+    <div id="final-result" class="hidden"></div>
     <div id="thank-you" class="hidden">
         <h1>Herzlichen Dank für Ihre Mitarbeit.</h1>
         <p>Auf Ihrem Desktop wurden folgende PDF abgelegt: Anamnese und Testergebnisse.pdf, Diskrimination.pdf und Dichotisch.pdf . Bitte bringen Sie diese ausgedruckt zu Ihrem Besuch bei uns mit oder senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!<p> Bitte beachten Sie, dass der Hörtest besonderer Interpretation bedarf und nur für den Gebrauch in unserer Praxis vorgesehen ist!</p>
