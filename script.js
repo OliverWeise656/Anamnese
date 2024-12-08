@@ -864,7 +864,7 @@ function generateSummary() {
 function saveResultsAsPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFontSize(9);  // Ändere '12' auf die gewünschte Schriftgröße
+    doc.setFontSize(7);  // Ändere '12' auf die gewünschte Schriftgröße
     
   let yPosition = 10; // Initiale Y-Position
 
