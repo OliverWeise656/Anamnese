@@ -67,7 +67,7 @@ async function sendMessage() {
             }
         };
 
-        redirectTimeout = setTimeout(proceedToNextStep, 10000);
+        redirectTimeout = setTimeout(proceedToNextStep, 20000);
 
         const skipButton = document.getElementById('skipButton');
         if (skipButton) {
