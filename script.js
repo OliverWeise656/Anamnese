@@ -46,11 +46,17 @@ async function sendMessage() {
 
 // Wenn keine Eingabe erfolgt: Direkt zu den Tests leiten
 if (userInput.trim() === '') {
+    // Letzte Arztantwort (sofern vorhanden)
+    const lastDoctorMessage = conversation.findLast(c => c.role === 'assistant')?.content || '';
+
+    // Leere Eingabe trotzdem als Eintrag speichern
+    await appendRow(['[leer]', lastDoctorMessage, new Date().toLocaleString()]);
+
     // Eingabefeld und Button ausblenden
     document.getElementById('userInput').style.display = 'none';
     document.querySelector('button[onclick="sendMessage()"]').style.display = 'none';
 
-    // Optional: Hinweistext anzeigen
+    // Hinweis anzeigen
     const messagesDiv = document.getElementById('messages');
     const hint = document.createElement('div');
     hint.classList.add('message', 'doktor');
@@ -58,19 +64,18 @@ if (userInput.trim() === '') {
     messagesDiv.appendChild(hint);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-    // Kurze Pause, dann Weiterleitung zu Tests
+    // Weiterleitung
     setTimeout(() => {
         if (state.hearingTestRecommended) {
             startToneSetting();
         } else if (state.voiceAnalysisRecommended) {
             window.location.href = 'https://voice-handicap-index.glitch.me';
         } else {
-            startToneSetting(); // Standard: Hörtest trotzdem anbieten
+            startToneSetting(); // Fallback
         }
     }, 3000);
     return;
 }
-
 
     addMessageToChat('User', userInput);
     document.getElementById('userInput').value = '';
