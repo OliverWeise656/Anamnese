@@ -43,7 +43,34 @@ let state = {
 
 async function sendMessage() {
     const userInput = document.getElementById('userInput').value;
-    if (userInput.trim() === '') return;
+
+// Wenn keine Eingabe erfolgt: Direkt zu den Tests leiten
+if (userInput.trim() === '') {
+    // Eingabefeld und Button ausblenden
+    document.getElementById('userInput').style.display = 'none';
+    document.querySelector('button[onclick="sendMessage()"]').style.display = 'none';
+
+    // Optional: Hinweistext anzeigen
+    const messagesDiv = document.getElementById('messages');
+    const hint = document.createElement('div');
+    hint.classList.add('message', 'doktor');
+    hint.textContent = 'Sie haben keine Angaben gemacht. Wir leiten Sie direkt zu den Tests weiter.';
+    messagesDiv.appendChild(hint);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Kurze Pause, dann Weiterleitung zu Tests
+    setTimeout(() => {
+        if (state.hearingTestRecommended) {
+            startToneSetting();
+        } else if (state.voiceAnalysisRecommended) {
+            window.location.href = 'https://voice-handicap-index.glitch.me';
+        } else {
+            startToneSetting(); // Standard: Hörtest trotzdem anbieten
+        }
+    }, 3000);
+    return;
+}
+
 
     addMessageToChat('User', userInput);
     document.getElementById('userInput').value = '';
