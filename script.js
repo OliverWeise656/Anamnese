@@ -310,10 +310,38 @@ async function getDoctorResponse(userInput) {
         }
     }
 
-    const anamnesis = createAnamnesis();
-    const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
-    return `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
-}
+const anamnesis = createAnamnesis();
+const additionalRecommendation = getAdditionalRecommendations(state.reason, state.age);
+
+// Letzte Ausgabe generieren
+const finalMessage = `Vielen Dank für die Informationen. Basierend auf Ihrer Schilderung empfehlen wir, dass Sie ${state.urgency} in die Praxis kommen.\n\nAnamnese:\n${anamnesis}${additionalRecommendation}`;
+
+// Eingabe und Senden-Button ausblenden
+document.getElementById('userInput').style.display = 'none';
+document.querySelector('button[onclick="sendMessage()"]').style.display = 'none';
+
+// "Weiter"-Button einblenden
+const continueButton = document.getElementById('manualContinueButton');
+continueButton.classList.remove('hidden');
+
+// Weiterleitungsfunktion definieren
+const proceedToNextStep = () => {
+    if (state.hearingTestRecommended) {
+        startToneSetting();
+    } else if (state.voiceAnalysisRecommended) {
+        window.location.href = 'https://voice-handicap-index.glitch.me';
+    }
+};
+
+// Event Listener für manuellen Klick
+continueButton.addEventListener('click', proceedToNextStep, { once: true });
+
+// Automatische Weiterleitung nach 10 Sekunden
+setTimeout(proceedToNextStep, 10000);
+
+return finalMessage;
+} // <-- Das ist die schließende Klammer von getDoctorResponse
+
 
 function updateUrgency(duration, intensity, isChild = false) {
     const days = parseInt(duration.split(' ')[0]); // Annahme, dass die Eingabe im Format "X Tage" erfolgt
