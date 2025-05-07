@@ -608,6 +608,7 @@ function playWord() {
     const word = selectedWords[currentWordIndex];
     const audio = new SpeechSynthesisUtterance(word);
     audio.volume = initialVolume;
+    audio.rate = 0.5; // Verlangsamt die Aussprache
     window.speechSynthesis.speak(audio);
 }
 
