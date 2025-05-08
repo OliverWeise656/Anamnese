@@ -707,19 +707,6 @@ function showFinalResult() {
     startHearingTestProcess();
   }, 3000);
 }
-
-function startHearingTestProcess() {
-  document.getElementById('hearing-test').style.display = 'block';
-}
-
-// Call showHearingTestInfo() after the initial test is completed
-function showInitialResult() {
-    document.getElementById('test-area').style.display = 'none';
-    document.getElementById('initial-test-result').style.display = 'block';
-    document.getElementById('initial-test-result').innerText = 'Test beendet! Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
-    setTimeout(showHearingTestInfo, 3000);
-}
-
 function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
 }
@@ -748,19 +735,26 @@ function startToneHearingTest() {
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
 
-  // Anfangslautstärke auf 0 setzen
+  // Lautstärke auf 0 (stumm)
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-
   panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
-  oscillator.connect(gainNode);
-  gainNode.connect(panner);
-  panner.connect(audioContext.destination);
+  // Dummy-GainNode: verhindert hörbaren Start
+  let dummyGain = audioContext.createGain();
+  dummyGain.gain.setValueAtTime(0, audioContext.currentTime);
+  oscillator.connect(dummyGain);
+  dummyGain.connect(audioContext.destination);
 
+  // Oszillator starten – aber noch stumm
   oscillator.start();
 
-  // Lautstärke erst nach 300ms langsam steigern
+  // Nach 300ms „echte“ Verbindung herstellen und Lautstärke langsam steigern
   setTimeout(() => {
+    oscillator.disconnect(dummyGain);
+    oscillator.connect(gainNode);
+    gainNode.connect(panner);
+    panner.connect(audioContext.destination);
+
     increaseVolume();
   }, 300);
 }
@@ -789,7 +783,7 @@ function heardTone() {
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startToneHearingTest, Math.random() * (5000 - 250) + 250); // Zufällige Pause zwischen 250ms und 5s
+    setTimeout(startToneHearingTest, Math.random() * (5000 - 250) + 250); // Zufällige Pause
   } else {
     if (currentSide === 'right') {
       document.getElementById('test-area').classList.add('hidden');
@@ -809,6 +803,7 @@ function stopToneHearingTest() {
   gainNode.disconnect();
   audioContext.close();
 }
+
 
 function displayResults() {
   document.getElementById('results').classList.remove('hidden');
