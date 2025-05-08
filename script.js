@@ -698,16 +698,6 @@ function nextHearingWord() {
   }
 }
 
-function showFinalResult() {
-  document.getElementById('test').style.display = 'none';
-  document.getElementById('final-result').style.display = 'block';
-  document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
-  setTimeout(() => {
-    document.getElementById('final-result').style.display = 'none';
-    startHearingTestProcess();
-  }, 3000);
-}
-
 function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
 }
@@ -717,6 +707,7 @@ let currentFrequencyIndex = 0;
 let currentDb = -58; // Startlautstärke auf -58 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
+let audioContext, oscillator, gainNode, panner;
 
 function startTest(side) {
   currentSide = side;
@@ -736,20 +727,24 @@ function startToneHearingTest() {
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
 
-  // Seite einstellen
+  // Seite einstellen (links oder rechts)
   panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
-  // Gain auf 0, keine Verbindung zum Ausgang
+  // Initial Gain auf 0
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-  oscillator.connect(gainNode); // Noch nicht weiter verbinden
 
-  // Nach kurzer Verzögerung Verbindung herstellen und Oszillator starten
+  // Audio-Routing herstellen
+  oscillator.connect(gainNode);
+  gainNode.connect(panner);
+  panner.connect(audioContext.destination);
+
+  // Oszillator starten NACHDEM alles verbunden ist
+  oscillator.start(audioContext.currentTime + 0.05); // kleiner Vorlauf für Sicherheit
+
+  // Leiser Start – beginne mit der Lautstärkesteigerung nach 100ms
   setTimeout(() => {
-    gainNode.connect(panner);
-    panner.connect(audioContext.destination);
-    oscillator.start(); // Start erst nach Verbindung
     increaseVolume();
-  }, 200);
+  }, 100);
 }
 
 function increaseVolume() {
@@ -762,7 +757,7 @@ function increaseVolume() {
     if (currentDb < targetDb) {
       currentDb += stepDb;
       let gainValue = Math.pow(10, currentDb / 20);
-      gainNode.gain.linearRampToValueAtTime(gainValue, audioContext.currentTime + 0.2);
+      gainNode.gain.setTargetAtTime(gainValue, audioContext.currentTime, 0.1); // weicher Übergang
       setTimeout(stepGain, intervalMs);
     }
   };
@@ -792,22 +787,16 @@ function heardTone() {
 
 function stopToneHearingTest() {
   // Sanft ausblenden
-  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
+  gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.1);
   setTimeout(() => {
     oscillator.stop();
     oscillator.disconnect();
     gainNode.disconnect();
     panner.disconnect();
     audioContext.close();
-  }, 150);
+  }, 200);
 }
 
-
-
-
-function displayResults() {
-  document.getElementById('results').classList.remove('hidden');
-}
 
 function renderChart() {
   const ctx = document.getElementById('resultsChart').getContext('2d');
