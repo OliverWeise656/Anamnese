@@ -735,28 +735,33 @@ function startToneHearingTest() {
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
 
-  // Lautstärke auf 0 (stumm)
+  // Initiale Lautstärke auf 0
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+
+  // Seite einstellen
   panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
-  // Dummy-GainNode: verhindert hörbaren Start
-  let dummyGain = audioContext.createGain();
-  dummyGain.gain.setValueAtTime(0, audioContext.currentTime);
-  oscillator.connect(dummyGain);
-  dummyGain.connect(audioContext.destination);
+  // Audio-Routing
+  oscillator.connect(gainNode);
+  gainNode.connect(panner);
+  panner.connect(audioContext.destination);
 
-  // Oszillator starten – aber noch stumm
-  oscillator.start();
+  // AudioContext aktivieren (z. B. bei Browser-Gating)
+  audioContext.resume().then(() => {
+    // Startzeit minimal in der Zukunft setzen
+    const startTime = audioContext.currentTime + 0.05;
 
-  // Nach 300ms „echte“ Verbindung herstellen und Lautstärke langsam steigern
-  setTimeout(() => {
-    oscillator.disconnect(dummyGain);
-    oscillator.connect(gainNode);
-    gainNode.connect(panner);
-    panner.connect(audioContext.destination);
+    oscillator.start(startTime);
 
-    increaseVolume();
-  }, 300);
+    // Lautstärke ab startTime langsam steigern
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(Math.pow(10, currentDb / 20), startTime + 0.1);
+
+    // Dann normales Volume-Steigern starten
+    setTimeout(() => {
+      increaseVolume();
+    }, 300);
+  });
 }
 
 function increaseVolume() {
@@ -798,10 +803,15 @@ function heardTone() {
 }
 
 function stopToneHearingTest() {
-  oscillator.stop();
-  oscillator.disconnect();
-  gainNode.disconnect();
-  audioContext.close();
+  // Lautstärke sanft auf 0 senken
+  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
+  setTimeout(() => {
+    oscillator.stop();
+    oscillator.disconnect();
+    gainNode.disconnect();
+    panner.disconnect();
+    audioContext.close();
+  }, 150);
 }
 
 
