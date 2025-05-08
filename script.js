@@ -707,6 +707,7 @@ function showFinalResult() {
     startHearingTestProcess();
   }, 3000);
 }
+
 function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
 }
@@ -735,33 +736,20 @@ function startToneHearingTest() {
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
 
-  // Initiale Lautstärke auf 0
-  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-
   // Seite einstellen
   panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
-  // Audio-Routing
-  oscillator.connect(gainNode);
-  gainNode.connect(panner);
-  panner.connect(audioContext.destination);
+  // Gain auf 0, keine Verbindung zum Ausgang
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  oscillator.connect(gainNode); // Noch nicht weiter verbinden
 
-  // AudioContext aktivieren (z. B. bei Browser-Gating)
-  audioContext.resume().then(() => {
-    // Startzeit minimal in der Zukunft setzen
-    const startTime = audioContext.currentTime + 0.05;
-
-    oscillator.start(startTime);
-
-    // Lautstärke ab startTime langsam steigern
-    gainNode.gain.setValueAtTime(0, startTime);
-    gainNode.gain.linearRampToValueAtTime(Math.pow(10, currentDb / 20), startTime + 0.1);
-
-    // Dann normales Volume-Steigern starten
-    setTimeout(() => {
-      increaseVolume();
-    }, 300);
-  });
+  // Nach kurzer Verzögerung Verbindung herstellen und Oszillator starten
+  setTimeout(() => {
+    gainNode.connect(panner);
+    panner.connect(audioContext.destination);
+    oscillator.start(); // Start erst nach Verbindung
+    increaseVolume();
+  }, 200);
 }
 
 function increaseVolume() {
@@ -803,7 +791,7 @@ function heardTone() {
 }
 
 function stopToneHearingTest() {
-  // Lautstärke sanft auf 0 senken
+  // Sanft ausblenden
   gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
   setTimeout(() => {
     oscillator.stop();
@@ -813,6 +801,8 @@ function stopToneHearingTest() {
     audioContext.close();
   }, 150);
 }
+
+
 
 
 function displayResults() {
