@@ -720,14 +720,13 @@ function showInitialResult() {
     setTimeout(showHearingTestInfo, 3000);
 }
 
-
 function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
 }
 
 let frequencies = [500, 750, 1000, 2000, 4000, 6000];
 let currentFrequencyIndex = 0;
-let currentDb = -58; // Startlautstärke auf -60 dB setzen
+let currentDb = -58; // Startlautstärke auf -58 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
 
@@ -748,9 +747,10 @@ function startToneHearingTest() {
 
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
-  gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
 
-  // Set the panner to the appropriate side
+  // Anfangslautstärke auf 0 setzen
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+
   panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
 
   oscillator.connect(gainNode);
@@ -759,19 +759,28 @@ function startToneHearingTest() {
 
   oscillator.start();
 
-  increaseVolume();
+  // Lautstärke erst nach 300ms langsam steigern
+  setTimeout(() => {
+    increaseVolume();
+  }, 300);
 }
 
 function increaseVolume() {
-  currentDb = -58; // Startlautstärke auf -40 dB setzen
-  let increaseInterval = setInterval(() => {
-    if (currentDb < 90) {
-      currentDb += 0.5; // Schrittweise Erhöhung um 0.5 dB
-      gainNode.gain.setValueAtTime(Math.pow(10, currentDb / 20), audioContext.currentTime);
-    } else {
-      clearInterval(increaseInterval);
+  currentDb = -58;
+  const targetDb = 90;
+  const stepDb = 0.5;
+  const intervalMs = 200;
+
+  const stepGain = () => {
+    if (currentDb < targetDb) {
+      currentDb += stepDb;
+      let gainValue = Math.pow(10, currentDb / 20);
+      gainNode.gain.linearRampToValueAtTime(gainValue, audioContext.currentTime + 0.2);
+      setTimeout(stepGain, intervalMs);
     }
-  }, 500);  // Erhöhungsintervall auf 1 Sekunde setzen
+  };
+
+  stepGain();
 }
 
 function heardTone() {
@@ -780,7 +789,7 @@ function heardTone() {
 
   if (currentFrequencyIndex < frequencies.length - 1) {
     currentFrequencyIndex++;
-    setTimeout(startToneHearingTest, Math.random() * (5000 - 250) + 250);
+    setTimeout(startToneHearingTest, Math.random() * (5000 - 250) + 250); // Zufällige Pause zwischen 250ms und 5s
   } else {
     if (currentSide === 'right') {
       document.getElementById('test-area').classList.add('hidden');
@@ -836,10 +845,9 @@ function renderChart() {
         y: {
           reverse: true,
           min: 0,
-          max: 150, // -60 dB to 90 dB
+          max: 150,
           ticks: {
             callback: function(value) {
-              // Adjust the displayed value to match the desired dB scale
               if (value === 0) return '0 dB';
               if (value === 20) return '-20 dB';
               if (value === 40) return '-40 dB';
@@ -870,6 +878,7 @@ function renderChart() {
 
   document.getElementById('resultsChart').classList.remove('hidden');
 }
+
 
 function generateSummary() {
     let summary = `Alter des Patienten: ${state.age} Jahre\n`;
