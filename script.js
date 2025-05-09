@@ -571,7 +571,7 @@ function startInitialTest() {
 }
 
 const words = ["haus", "baum", "hund", "katze", "fisch", "vogel", "blume", "tisch", "stuhl", "auto", 
-               "rad", "uhr", "buch", "glas", "fenster", "tür", "weg", "licht", "bild", "zug", 
+               "rad", "uhr", "buch", "glas", "fenster", "tür", "weeg", "licht", "bild", "zug", 
                "boot", "stadt", "dorf", "berg", "fluss", "meer", "insel", "sonne", "mond", "stern", 
                "gold", "geld", "hand", "kopf", "bein", "fuß", "ohr", "mund", "nase", "auge", 
                "brot", "kuchen", "salz", "zucker", "milch", "kaffee", "tee", "wein", "bier", "wasser",
