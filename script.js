@@ -632,7 +632,7 @@ function showInitialResult() {
     document.getElementById('test-area').style.display = 'none';
     document.getElementById('initial-test-result').style.display = 'block';
     document.getElementById('initial-test-result').innerText = 'Test beendet! Deine Punktzahl: ' + state.initialTestScore + ' von ' + numWords;
-    setTimeout(startHearingTest, 3000);
+    setTimeout(showHearingTestInfo, 3000);
 }
 
 // --- Ab hier ist der Hörtest im Störschall Teil ---
