@@ -698,6 +698,15 @@ function nextHearingWord() {
   }
 }
 
+function showFinalResult() {
+  document.getElementById('test').style.display = 'none';
+  document.getElementById('final-result').style.display = 'block';
+  document.getElementById('final-result').innerText = 'Test beendet! Gesamtpunktzahl: ' + state.hearingTestScore + ' von ' + testWords.length;
+  setTimeout(() => {
+    document.getElementById('final-result').style.display = 'none';
+    startHearingTestProcess();
+  }, 3000);
+}
 function startHearingTestProcess() {
   document.getElementById('hearing-test').style.display = 'block';
 }
@@ -707,7 +716,6 @@ let currentFrequencyIndex = 0;
 let currentDb = -58; // Startlautstärke auf -58 dB setzen
 let results = { right: {}, left: {} };
 let currentSide = '';
-let audioContext, oscillator, gainNode, panner;
 
 function startTest(side) {
   currentSide = side;
@@ -727,24 +735,33 @@ function startToneHearingTest() {
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequencies[currentFrequencyIndex], audioContext.currentTime);
 
-  // Seite einstellen (links oder rechts)
-  panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
-
-  // Initial Gain auf 0
+  // Initiale Lautstärke auf 0
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
 
-  // Audio-Routing herstellen
+  // Seite einstellen
+  panner.pan.setValueAtTime(currentSide === 'right' ? 1 : -1, audioContext.currentTime);
+
+  // Audio-Routing
   oscillator.connect(gainNode);
   gainNode.connect(panner);
   panner.connect(audioContext.destination);
 
-  // Oszillator starten NACHDEM alles verbunden ist
-  oscillator.start(audioContext.currentTime + 0.05); // kleiner Vorlauf für Sicherheit
+  // AudioContext aktivieren (z. B. bei Browser-Gating)
+  audioContext.resume().then(() => {
+    // Startzeit minimal in der Zukunft setzen
+    const startTime = audioContext.currentTime + 0.05;
 
-  // Leiser Start – beginne mit der Lautstärkesteigerung nach 100ms
-  setTimeout(() => {
-    increaseVolume();
-  }, 100);
+    oscillator.start(startTime);
+
+    // Lautstärke ab startTime langsam steigern
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(Math.pow(10, currentDb / 20), startTime + 0.1);
+
+    // Dann normales Volume-Steigern starten
+    setTimeout(() => {
+      increaseVolume();
+    }, 300);
+  });
 }
 
 function increaseVolume() {
@@ -757,7 +774,7 @@ function increaseVolume() {
     if (currentDb < targetDb) {
       currentDb += stepDb;
       let gainValue = Math.pow(10, currentDb / 20);
-      gainNode.gain.setTargetAtTime(gainValue, audioContext.currentTime, 0.1); // weicher Übergang
+      gainNode.gain.linearRampToValueAtTime(gainValue, audioContext.currentTime + 0.2);
       setTimeout(stepGain, intervalMs);
     }
   };
@@ -786,17 +803,21 @@ function heardTone() {
 }
 
 function stopToneHearingTest() {
-  // Sanft ausblenden
-  gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.1);
+  // Lautstärke sanft auf 0 senken
+  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
   setTimeout(() => {
     oscillator.stop();
     oscillator.disconnect();
     gainNode.disconnect();
     panner.disconnect();
     audioContext.close();
-  }, 200);
+  }, 150);
 }
 
+
+function displayResults() {
+  document.getElementById('results').classList.remove('hidden');
+}
 
 function renderChart() {
   const ctx = document.getElementById('resultsChart').getContext('2d');
