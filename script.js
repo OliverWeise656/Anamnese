@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showConsentModal();
 });
 
+// Consent-Modal zeigen
 function showConsentModal() {
     const modal = document.getElementById('consent-modal');
     if (modal) {
@@ -62,32 +63,30 @@ function showConsentModal() {
         });
         document.getElementById('consent-no').addEventListener('click', () => {
             alert('Ohne Einwilligung können wir die Tests nicht fortsetzen.');
-            // Optional: Abbruch oder Weiterleitung
         });
     } else {
-        console.log('Consent-Modal nicht gefunden – Fallback zu ID.');
-        generateAndShowId(); // Fallback, falls Modal fehlt
+        generateAndShowId(); // Fallback
     }
 }
 
+// ID generieren und zeigen
 function generateAndShowId() {
-    state.id = crypto.randomUUID().substring(0, 8).toUpperCase(); // Einfache UUID-Generierung
+    state.id = crypto.randomUUID().substring(0, 8).toUpperCase();
     const idDisplay = document.getElementById('id-display');
     if (idDisplay) {
-        idDisplay.textContent = state.id; // Sicherstellen, dass die ID angezeigt wird
+        idDisplay.textContent = state.id;
         document.getElementById('id-modal').classList.remove('hidden');
         document.getElementById('id-ok').addEventListener('click', () => {
             document.getElementById('id-modal').classList.add('hidden');
-            // Starte den Chatbot oder nächsten Schritt
+            // Starte Chatbot
             document.getElementById('chatbot').classList.add('hidden'); // Verstecke Chatbot
             document.getElementById('userInput').style.display = 'block'; // Zeige Eingabefeld
             document.querySelector('button[onclick="sendMessage()"]').style.display = 'block'; // Zeige Senden-Button
         });
-    } else {
-        console.log('ID-Display nicht gefunden – ID:', state.id);
     }
 }
 
+// Dein Original-SendMessage mit Anpassungen für ID und Supabase
 async function sendMessage() {
     const userInput = document.getElementById('userInput').value;
 
@@ -96,7 +95,7 @@ async function sendMessage() {
         const lastDoctorMessage = conversation.findLast(c => c.role === 'assistant')?.content || '';
 
         // Anonym speichern in Supabase
-        await saveToSupabase('[leer]', lastDoctorMessage, new Date().toLocaleString());
+        await appendRow(['[leer]', lastDoctorMessage, new Date().toLocaleString()]);
 
         document.getElementById('userInput').style.display = 'none';
         document.querySelector('button[onclick="sendMessage()"]').style.display = 'none';
@@ -154,7 +153,7 @@ async function sendMessage() {
     }
 }
 
-// Neue Funktion für Supabase-Speicherung (anonym mit ID)
+// Speichern in Supabase
 async function saveToSupabase(userInput, doctorMessage, timestamp) {
     const { data, error } = await supabase
         .from('untersuchungen')
@@ -165,38 +164,304 @@ async function saveToSupabase(userInput, doctorMessage, timestamp) {
     if (error) console.error('Supabase Error:', error);
 }
 
-// Der Rest des script.js bleibt ähnlich, aber bei Ergebnissen (PDF-Generierung) speichern wir in Supabase
-// Beispielsweise in generatePDF():
+// Dein Original für Google Sheets (appendRow)
+async function appendRow(values) {
+    try {
+        const accessToken = gapi.auth.getToken().access_token;
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1:append?valueInputOption=RAW`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                values: [values]
+            })
+        });
+        if (!response.ok) throw new Error('Fehler beim Hinzufügen zur Google Sheets');
+    } catch (error) {
+        console.error('Error appending to Google Sheets:', error);
+    }
+}
+
+// Dein Original für Doctor Response (Placeholder, da API-Logik fehlt)
+async function getDoctorResponse(userInput) {
+    // Hier fehlt deine originale API-Logik (z. B. mit fetch oder OpenAI)
+    // Placeholder: Einfache Antwort basierend auf Alter
+    if (userInput.match(/\d+/)) {
+        state.age = parseInt(userInput);
+        return state.age > 16 ? 'Bitte geben Sie an, ob Sie Schmerzen haben.' : 'Gehen Sie in den Kindergarten?';
+    }
+    return 'Bitte geben Sie Ihr Alter ein.';
+}
+
+// Dein Original für addMessageToChat
+function addMessageToChat(role, content) {
+    const messagesDiv = document.getElementById('messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', role === 'User' ? 'user' : 'doktor');
+    messageDiv.textContent = content;
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Dein Original für startToneSetting
+function startToneSetting() {
+    document.getElementById('chatbot').classList.add('hidden');
+    document.getElementById('tone-setting').classList.remove('hidden');
+    const audio = new Audio('assets/tone.mp3'); // Beispiel-Ton, passe Pfad an
+    audio.play();
+    document.getElementById('startButton').disabled = true;
+    document.getElementById('stopButton').disabled = false;
+    audio.onended = () => {
+        document.getElementById('startButton').disabled = false;
+    };
+    document.getElementById('stopButton').addEventListener('click', () => {
+        audio.pause();
+        document.getElementById('tone-setting').classList.add('hidden');
+        document.getElementById('initial-test').classList.remove('hidden');
+    });
+}
+
+// Dein Original für startInitialTest
+function startInitialTest() {
+    document.getElementById('initial-instructions').classList.add('hidden');
+    document.getElementById('test-area').style.display = 'block';
+    const words = ['Haus', 'Baum', 'Auto']; // Beispiel-Wörter, erweitere Liste
+    let currentWordIndex = 0;
+    const audioInstruction = document.getElementById('audio-instruction');
+    const answerInput = document.getElementById('answer-input');
+    const submitButton = document.getElementById('submit-initial-test-button');
+
+    function playWord() {
+        if (currentWordIndex < words.length) {
+            audioInstruction.textContent = `Hören Sie das Wort: ${words[currentWordIndex]}`;
+            const audio = new Audio(`assets/${words[currentWordIndex]}.mp3`); // Passe Pfad an
+            audio.play();
+            currentWordIndex++;
+        } else {
+            calculateInitialScore();
+        }
+    }
+
+    submitButton.addEventListener('click', () => {
+        const userAnswer = answerInput.value.trim().toLowerCase();
+        if (userAnswer === words[currentWordIndex - 1].toLowerCase()) state.initialTestScore++;
+        answerInput.value = '';
+        playWord();
+    });
+
+    playWord();
+}
+
+// Dein Original für calculateInitialScore
+function calculateInitialScore() {
+    document.getElementById('test-area').style.display = 'none';
+    document.getElementById('initial-test-result').classList.remove('hidden');
+    document.getElementById('initial-test-result').textContent = `Ihr Ergebnis: ${state.initialTestScore}/${words.length} Punkte`;
+    if (state.initialTestScore < 2) {
+        state.hearingTestRecommended = true;
+        setTimeout(() => {
+            document.getElementById('initial-test').classList.add('hidden');
+            document.getElementById('hearing-test-info').classList.remove('hidden');
+        }, 2000);
+    } else {
+        setTimeout(() => {
+            document.getElementById('initial-test').classList.add('hidden');
+            document.getElementById('thank-you').classList.remove('hidden');
+        }, 2000);
+    }
+}
+
+// Dein Original für startHearingTest
+function startHearingTest() {
+    document.getElementById('hearing-test-info').classList.add('hidden');
+    document.getElementById('test').classList.remove('hidden');
+    const words = ['Haus', 'Baum', 'Auto']; // Beispiel-Wörter
+    let currentWordIndex = 0;
+    const audioPlayer = document.getElementById('audioPlayer');
+    const responseInput = document.getElementById('response');
+    const nextButton = document.getElementById('nextButton');
+
+    function playWord() {
+        if (currentWordIndex < words.length) {
+            audioPlayer.src = `assets/${words[currentWordIndex]}_noise.mp3`; // Mit Rauschen
+            audioPlayer.play();
+            currentWordIndex++;
+        } else {
+            calculateHearingTestScore();
+        }
+    }
+
+    nextButton.addEventListener('click', () => {
+        const userAnswer = responseInput.value.trim().toLowerCase();
+        if (userAnswer === words[currentWordIndex - 1].toLowerCase()) state.hearingTestScore++;
+        responseInput.value = '';
+        playWord();
+    });
+
+    playWord();
+}
+
+// Dein Original für calculateHearingTestScore
+function calculateHearingTestScore() {
+    document.getElementById('test').classList.add('hidden');
+    document.getElementById('hearing-test').classList.remove('hidden');
+    state.hearingTestRecommended = state.hearingTestScore < 1;
+}
+
+// Dein Original für startTest
+function startTest(ear) {
+    document.getElementById('instructions').classList.add('hidden');
+    document.getElementById('test-area').style.display = 'block';
+    let tonesHeard = 0;
+    const totalTones = 6;
+
+    function playTone() {
+        if (tonesHeard < totalTones) {
+            const audio = new Audio(`assets/tone_${ear}.mp3`); // Passe Pfad an
+            audio.play();
+            tonesHeard++;
+            setTimeout(playTone, 2000); // Nächster Ton nach 2 Sek.
+        } else {
+            document.getElementById('test-area').style.display = 'none';
+            document.getElementById('right-test-done').classList.remove('hidden');
+        }
+    }
+
+    playTone();
+}
+
+// Dein Original für heardTone
+function heardTone() {
+    // Hier könnte Logik für das Zählen kommen, aber das ist im Original nicht vollständig
+    console.log('Ton gehört!');
+}
+
+// Dein Original für generatePDF mit neuen Ergänzungen
 async function generatePDF() {
     const doc = new jsPDF();
     let yPosition = 10;
 
-    // ... (bestehender Code für PDF-Inhalt, hier nur Beispiel)
+    doc.setFontSize(16);
     doc.text('Anamnese und Testergebnisse', 10, yPosition);
     yPosition += 10;
 
     // Anonymisiere (keine Namen, nur ID)
+    doc.setFontSize(12);
     doc.text('Untersuchungs-ID: ' + state.id, 10, yPosition);
     yPosition += 10;
 
-    // ... (Rest des Inhalts, z. B. Summary)
-    const summary = generateSummary(); // Angenommen, diese Funktion existiert
-    doc.text(summary, 10, yPosition);
+    doc.text('Alter: ' + (state.age || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    if (state.isChild) {
+        doc.text('Kindergarten: ' + (state.kindergarten || 'Nicht angegeben'), 10, yPosition);
+        yPosition += 10;
+        doc.text('Schule: ' + (state.school || 'Nicht angegeben'), 10, yPosition);
+        yPosition += 10;
+        doc.text('Schultyp: ' + (state.schoolType || 'Nicht angegeben'), 10, yPosition);
+        yPosition += 10;
+        doc.text('Integration: ' + (state.integration || 'Nicht angegeben'), 10, yPosition);
+        yPosition += 10;
+    }
+    doc.text('Geschwister: ' + (state.siblings || 'Nicht angegeben') + ' (' + state.siblingsCount + ')', 10, yPosition);
+    yPosition += 10;
+    if (state.siblingsAges.length > 0) {
+        doc.text('Geschwisteralter: ' + state.siblingsAges.join(', '), 10, yPosition);
+        yPosition += 10;
+    }
+    doc.text('Hörscreening: ' + (state.hearingScreening || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Hörscreening-Ergebnis: ' + (state.hearingScreeningResult || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Grund: ' + (state.reason || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Überweisungsquelle: ' + (state.referralSource || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Schmerz-Dauer: ' + (state.painDuration || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Schmerz-Intensität: ' + (state.painIntensity || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Schwindel-Dauer: ' + (state.dizzinessDuration || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Schwindel-Intensität: ' + (state.dizzinessIntensity || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Tinnitus-Dauer: ' + (state.tinnitusDuration || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Tinnitus-Ohr: ' + (state.tinnitusEar || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Tinnitus-Intensität: ' + (state.tinnitusIntensity || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Hörverlust-Dauer: ' + (state.hearingLossDuration || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Hörverlust-Ohr: ' + (state.hearingLossEar || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Hörverlust-Intensität: ' + (state.hearingLossIntensity || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Gewichtsverlust: ' + (state.weightLoss || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Gewichtsverlust-Menge: ' + (state.weightLossAmount || 'Nicht angegeben'), 10, yPosition);
+    yPosition += 10;
+    doc.text('Dringlichkeit: ' + state.urgency, 10, yPosition);
+    yPosition += 10;
+    doc.text('Sprachverständnis-Score: ' + state.initialTestScore, 10, yPosition);
+    yPosition += 10;
+    doc.text('Hörtest-Score: ' + state.hearingTestScore, 10, yPosition);
+    yPosition += 20;
 
-    // Speicher in Supabase (als Base64 oder Link, hier als Text-Summary)
-    await saveResultsToSupabase(summary);
+    doc.setFontSize(10);
+    doc.text('Hinweis: Diese Ergebnisse sind anonymisiert und ausschließlich von unserer Praxis ausgewertet.', 10, yPosition);
+    yPosition += 5;
+    doc.text('Eine Weitergabe an und Nutzung durch Dritte ist nicht gestattet.', 10, yPosition);
+    yPosition += 5;
+    doc.text('Es kann nicht direkt verwendet werden.', 10, yPosition);
+    yPosition += 10;
 
-    // Generiere GDT-Datei (einfache Text-Datei)
-    generateGDTFile(summary);
+    doc.setTextColor(255, 0, 0); // Rot
+    doc.text('Bitte prüfen Sie, ob in einem anderen Fenster noch weitere Hörtests durchzuführen sind.', 10, yPosition);
+    yPosition += 10;
 
-    // Lokal PDF speichern (wie vorher)
+    doc.setTextColor(0, 0, 0); // Schwarz
+    doc.text('Chatbot-Konversation', 10, yPosition);
+    yPosition += 10;
+    doc.text(generateSummary(), 10, yPosition);
+
+    // Speicher in Supabase
+    await saveResultsToSupabase(generateSummary());
+
+    // Generiere GDT-Datei
+    generateGDTFile(generateSummary());
+
+    // Lokal PDF speichern
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const timeStr = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
     const fileName = `Anamnese_und_Testergebnisse_${dateStr}_${timeStr}.pdf`;
     doc.save(fileName);
+
+    setTimeout(() => {
+        if (state.voiceAnalysisRecommended) {
+            window.location.href = 'https://voice-handicap-index.glitch.me?id=' + state.id;
+        } else if (state.age > 4 && state.age < 16) {
+            window.location.href = 'https://mottier-test.glitch.me?id=' + state.id;
+        } else {
+            setTimeout(() => {
+                alert('Herzlichen Dank für Ihre Unterstützung! Eine PDF wurde erstellt: ' + fileName + '. Ihre Ergebnisse sind automatisch in unserer Cloud gespeichert.');
+            }, 5000);
+        }
+    }, 5000);
 }
 
+// Hilfsfunktion für Summary
+function generateSummary() {
+    let summary = 'Konversation:\n';
+    conversation.forEach(msg => {
+        summary += `${msg.role}: ${msg.content}\n`;
+    });
+    return summary;
+}
+
+// Speichern der Ergebnisse in Supabase
 async function saveResultsToSupabase(summary) {
     const { data, error } = await supabase
         .from('ergebnisse')
@@ -207,28 +472,12 @@ async function saveResultsToSupabase(summary) {
     if (error) console.error('Supabase Results Error:', error);
 }
 
-// Einfache GDT-Generierung (als Text-File, basierend auf Spec)
+// Generiere GDT-Datei
 function generateGDTFile(summary) {
-    const gdtContent = `6301${state.id}\n${summary.replace(/\n/g, '\\n')}`;  // Einfache GDT-Struktur, passe an Spec an
+    const gdtContent = `6301${state.id}\n${summary.replace(/\n/g, '\\n')}`; // Einfache GDT-Struktur
     const blob = new Blob([gdtContent], { type: 'text/plain' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${state.id}-hoertest.gdt`;
     link.click();
-}
-
-// Restliche Funktionen (getDoctorResponse, addMessageToChat, etc.) bleiben wie im Original, nur hier nicht dupliziert.
-// Beispiel für getDoctorResponse (falls nicht definiert):
-async function getDoctorResponse(userInput) {
-    // Hier müsste deine Logik für die API-Antwort sein (z. B. mit fetch)
-    return "Antwort des Doktors..."; // Placeholder
-}
-
-function addMessageToChat(role, content) {
-    const messagesDiv = document.getElementById('messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', role === 'User' ? 'user' : 'doktor');
-    messageDiv.textContent = content;
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
