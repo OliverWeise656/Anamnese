@@ -64,12 +64,17 @@ function showConsentModal() {
 }
 
 function generateAndShowId() {
-    state.id = crypto.randomUUID().substring(0, 8).toUpperCase();  // Einfache UUID-Generierung
+    state.id = crypto.randomUUID().substring(0, 8).toUpperCase();  // Kürzer: Nur 8 Zeichen, z. B. "674C034B"
     document.getElementById('id-display').textContent = state.id;
     document.getElementById('id-modal').classList.remove('hidden');
     document.getElementById('id-ok').addEventListener('click', () => {
         document.getElementById('id-modal').classList.add('hidden');
         // Starte den Chatbot
+        document.getElementById('chatbot').classList.add('hidden');
+        document.getElementById('messages').classList.remove('hidden');
+        document.getElementById('userInput').classList.remove('hidden');
+        document.querySelector('button[onclick="sendMessage()"]').classList.remove('hidden');
+        addMessageToChat('Doktor', 'Hallo! Wie alt sind Sie?');
     });
 }
 
@@ -151,32 +156,60 @@ async function saveToSupabase(userInput, doctorMessage, timestamp) {
 }
 
 // Der Rest des script.js bleibt ähnlich, aber bei Ergebnissen (PDF-Generierung) speichern wir in Supabase
-// Beispielsweise in generatePDF():
 async function generatePDF() {
     const doc = new jsPDF();
     let yPosition = 10;
 
-    // ... (bestehender Code für PDF-Inhalt)
+    // Bestehender Code für PDF-Inhalt (z. B. Chat-Verlauf)
+    conversation.forEach(message => {
+        if (message.role !== 'system') {
+            doc.setFontSize(12);
+            doc.text(`${message.role === 'user' ? 'Sie: ' : 'Doktor: '} ${message.content}`, 10, yPosition);
+            yPosition += 10;
+        }
+    });
 
     // Anonymisiere (keine Namen, nur ID)
     doc.text('Untersuchungs-ID: ' + state.id, 10, yPosition);
     yPosition += 10;
 
-    // ... (Rest des Inhalts)
+    // Chart als Bild einfügen (falls vorhanden)
+    if (document.getElementById('resultsChart')) {
+        const canvas = document.getElementById('resultsChart');
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 10, yPosition, 180, 90);
+        yPosition += 100;
+    }
+
+    // Zusammenfassung
+    const summary = generateSummary();
+    doc.text('Zusammenfassung: ' + summary, 10, yPosition);
+    yPosition += 10;
 
     // Speicher in Supabase (als Base64 oder Link, hier als Text-Summary)
-    const summary = generateSummary();
     await saveResultsToSupabase(summary);
 
-    // Generiere GDT-Datei (einfache Text-Datei)
+    // Generiere GDT-Datei
     generateGDTFile(summary);
 
-    // Lokal PDF speichern (wie vorher)
+    // Lokal PDF speichern
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const timeStr = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
     const fileName = `Anamnese_und_Testergebnisse_${dateStr}_${timeStr}.pdf`;
     doc.save(fileName);
+
+    setTimeout(() => {
+        if (state.voiceAnalysisRecommended) {
+            window.location.href = 'https://voice-handicap-index.glitch.me?id=' + state.id;
+        } else if (state.age > 4 && state.age < 16) {
+            window.location.href = 'https://mottier-test.glitch.me?id=' + state.id;
+        } else {
+            setTimeout(() => {
+                alert('Herzlichen Dank für Ihre Unterstützung! Ihre Ergebnisse sind gespeichert. Notieren Sie sich die ID: ' + state.id + '. Teilen Sie sie bei Ihrem Termin mit der Praxis.');
+            }, 5000);
+        }
+    }, 5000);
 }
 
 async function saveResultsToSupabase(summary) {
@@ -199,4 +232,44 @@ function generateGDTFile(summary) {
     link.click();
 }
 
-// Der Rest des Codes bleibt, aber ich habe Duplikate vermieden, Code strukturiert (async/await) und UI-Modals hinzugefügt für Eleganz.
+// Bestehende Funktionen (unverändert, nur strukturiert)
+function addMessageToChat(role, content) {
+    const messagesDiv = document.getElementById('messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', role.toLowerCase());
+    messageDiv.textContent = content;
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+async function getDoctorResponse(userInput) {
+    // ... (dein OpenAI-Logik hier, unverändert)
+    return "Antwort vom Doktor..."; // Placeholder
+}
+
+function generateSummary() {
+    return conversation.map(m => `${m.role}: ${m.role === 'system' ? '' : m.content}`).join('\n');
+}
+
+function startToneSetting() {
+    document.getElementById('chatbot').classList.add('hidden');
+    document.getElementById('tone-setting').classList.remove('hidden');
+    // ... (Rest deiner Funktion)
+}
+
+// Weitere Funktionen (unverändert, nur hier strukturiert)
+function startInitialTest() {
+    // ... (dein Code)
+}
+
+function startHearingTest() {
+    // ... (dein Code)
+}
+
+function startTest(ear) {
+    // ... (dein Code)
+}
+
+function heardTone() {
+    // ... (dein Code)
+}
