@@ -47,10 +47,27 @@ let state = {
     id: null // Neue State für ID
 };
 
-// Sicherstellen, dass das Consent-Modal zuerst kommt
+// NEU: Globale Button-Listeners (werden am Anfang gebunden)
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Seite geladen – starte Consent-Modal'); // Debug
     showConsentModal();
+
+    // Globaler Listener für ID-OK und Test-ID (funktioniert immer)
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'id-ok') {
+            document.getElementById('id-modal').classList.add('hidden');
+            console.log('ID-OK geklickt – starte Chatbot'); // Debug
+            // Starte Chatbot
+            document.getElementById('chatbot').classList.add('hidden'); // Verstecke Chatbot
+            document.getElementById('userInput').style.display = 'block'; // Zeige Eingabefeld
+            document.querySelector('button[onclick="sendMessage()"]').style.display = 'block'; // Zeige Senden-Button
+        } else if (e.target.id === 'test-id-button') {
+            const idDisplay = document.getElementById('id-display');
+            idDisplay.textContent = Math.random().toString(36).substring(2, 10).toUpperCase(); // Test-ID
+            console.log('Test-ID gesetzt'); // Debug
+            state.id = idDisplay.textContent; // Setze State
+        }
+    });
 });
 
 // Consent-Modal zeigen
@@ -68,19 +85,17 @@ function showConsentModal() {
             alert('Ohne Einwilligung können wir die Tests nicht fortsetzen.');
         });
     } else {
-        console.log('Consent-Modal nicht gefunden – Fallback zu ID.'); // Debug
         generateAndShowId(); // Fallback
     }
 }
 
-// ID generieren und zeigen (mit Fallback für crypto)
+// ID generieren und zeigen (mit Fallback)
 function generateAndShowId() {
-    // Versuche crypto.randomUUID(), Fallback zu Math.random()
     let id;
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
         id = crypto.randomUUID().substring(0, 8).toUpperCase();
     } else {
-        id = Math.random().toString(36).substring(2, 10).toUpperCase(); // Fallback-ID
+        id = Math.random().toString(36).substring(2, 10).toUpperCase(); // Fallback
     }
     state.id = id;
     const idDisplay = document.getElementById('id-display');
@@ -89,33 +104,18 @@ function generateAndShowId() {
         console.log('ID generiert und gesetzt:', id); // Debug
         document.getElementById('id-modal').classList.remove('hidden');
         console.log('ID-Modal gezeigt'); // Debug
-        document.getElementById('id-ok').addEventListener('click', () => {
-            document.getElementById('id-modal').classList.add('hidden');
-            console.log('ID-OK geklickt – starte Chatbot'); // Debug
-            // Starte Chatbot
-            document.getElementById('chatbot').classList.add('hidden'); // Verstecke Chatbot
-            document.getElementById('userInput').style.display = 'block'; // Zeige Eingabefeld
-            document.querySelector('button[onclick="sendMessage()"]').style.display = 'block'; // Zeige Senden-Button
-        });
-        // NEU: Test-Knopf für Debug
-        document.getElementById('test-id-button').addEventListener('click', () => {
-            idDisplay.textContent = Math.random().toString(36).substring(2, 10).toUpperCase(); // Test-ID
-            console.log('Test-ID gesetzt'); // Debug
-        });
     } else {
         console.log('ID-Display nicht gefunden – ID:', id); // Debug
     }
 }
 
-// Dein Original-SendMessage mit Anpassungen für ID und Supabase
+// Dein Original-SendMessage mit Anpassungen
 async function sendMessage() {
     const userInput = document.getElementById('userInput').value;
 
-    // Wenn keine Eingabe: Direkt zu Tests leiten, aber mit ID anonym speichern
     if (userInput.trim() === '') {
         const lastDoctorMessage = conversation.findLast(c => c.role === 'assistant')?.content || '';
 
-        // Anonym speichern in Supabase
         await appendRow(['[leer]', lastDoctorMessage, new Date().toLocaleString()]);
 
         document.getElementById('userInput').style.display = 'none';
@@ -132,9 +132,9 @@ async function sendMessage() {
             if (state.hearingTestRecommended) {
                 startToneSetting();
             } else if (state.voiceAnalysisRecommended) {
-                window.location.href = 'https://voice-handicap-index.glitch.me?id=' + state.id; // ID mitgeben
+                window.location.href = 'https://voice-handicap-index.glitch.me?id=' + state.id;
             } else {
-                startToneSetting(); // Fallback
+                startToneSetting();
             }
         }, 3000);
         return;
@@ -205,7 +205,7 @@ async function appendRow(values) {
     }
 }
 
-// Dein Original für getDoctorResponse (erweitert)
+// Dein Original für getDoctorResponse
 async function getDoctorResponse(userInput) {
     // Deine Original-API-Logik (OpenAI oder so)
     // Placeholder: Einfache Antwort basierend auf Alter
@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (stopButton) {
         stopButton.addEventListener('click', () => {
-            // Pause Audio (falls nötig)
+            // Pause Audio
             document.getElementById('tone-setting').classList.add('hidden');
             document.getElementById('initial-test').classList.remove('hidden');
         });
