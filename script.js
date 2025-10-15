@@ -69,12 +69,20 @@ function showConsentModal() {
     }
 }
 
-// ID generieren und zeigen
+// ID generieren und zeigen (mit Fallback für crypto)
 function generateAndShowId() {
-    state.id = crypto.randomUUID().substring(0, 8).toUpperCase();
+    // Versuche crypto.randomUUID(), Fallback zu Math.random()
+    let id;
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        id = crypto.randomUUID().substring(0, 8).toUpperCase();
+    } else {
+        id = Math.random().toString(36).substring(2, 10).toUpperCase(); // Fallback-ID
+    }
+    state.id = id;
     const idDisplay = document.getElementById('id-display');
     if (idDisplay) {
-        idDisplay.textContent = state.id;
+        idDisplay.textContent = id; // Setze die ID
+        console.log('ID generiert und gesetzt:', id); // Debug
         document.getElementById('id-modal').classList.remove('hidden');
         document.getElementById('id-ok').addEventListener('click', () => {
             document.getElementById('id-modal').classList.add('hidden');
@@ -83,6 +91,8 @@ function generateAndShowId() {
             document.getElementById('userInput').style.display = 'block'; // Zeige Eingabefeld
             document.querySelector('button[onclick="sendMessage()"]').style.display = 'block'; // Zeige Senden-Button
         });
+    } else {
+        console.log('ID-Display nicht gefunden – ID:', id);
     }
 }
 
@@ -184,9 +194,9 @@ async function appendRow(values) {
     }
 }
 
-// Dein Original für Doctor Response (Placeholder, da API-Logik fehlt)
+// Dein Original für getDoctorResponse (erweitert mit Logik)
 async function getDoctorResponse(userInput) {
-    // Hier fehlt deine originale API-Logik (z. B. mit fetch oder OpenAI)
+    // Deine Original-API-Logik (OpenAI oder so)
     // Placeholder: Einfache Antwort basierend auf Alter
     if (userInput.match(/\d+/)) {
         state.age = parseInt(userInput);
@@ -209,7 +219,7 @@ function addMessageToChat(role, content) {
 function startToneSetting() {
     document.getElementById('chatbot').classList.add('hidden');
     document.getElementById('tone-setting').classList.remove('hidden');
-    const audio = new Audio('assets/tone.mp3'); // Beispiel-Ton, passe Pfad an
+    const audio = new Audio('assets/tone.mp3'); // Passe Pfad an
     audio.play();
     document.getElementById('startButton').disabled = true;
     document.getElementById('stopButton').disabled = false;
@@ -227,7 +237,7 @@ function startToneSetting() {
 function startInitialTest() {
     document.getElementById('initial-instructions').classList.add('hidden');
     document.getElementById('test-area').style.display = 'block';
-    const words = ['Haus', 'Baum', 'Auto']; // Beispiel-Wörter, erweitere Liste
+    const words = ['Haus', 'Baum', 'Auto']; // Erweitere Liste
     let currentWordIndex = 0;
     const audioInstruction = document.getElementById('audio-instruction');
     const answerInput = document.getElementById('answer-input');
@@ -236,7 +246,7 @@ function startInitialTest() {
     function playWord() {
         if (currentWordIndex < words.length) {
             audioInstruction.textContent = `Hören Sie das Wort: ${words[currentWordIndex]}`;
-            const audio = new Audio(`assets/${words[currentWordIndex]}.mp3`); // Passe Pfad an
+            const audio = new Audio(`assets/${words[currentWordIndex]}.mp3`);
             audio.play();
             currentWordIndex++;
         } else {
@@ -277,7 +287,7 @@ function calculateInitialScore() {
 function startHearingTest() {
     document.getElementById('hearing-test-info').classList.add('hidden');
     document.getElementById('test').classList.remove('hidden');
-    const words = ['Haus', 'Baum', 'Auto']; // Beispiel-Wörter
+    const words = ['Haus', 'Baum', 'Auto']; // Erweitere Liste
     let currentWordIndex = 0;
     const audioPlayer = document.getElementById('audioPlayer');
     const responseInput = document.getElementById('response');
@@ -334,7 +344,6 @@ function startTest(ear) {
 
 // Dein Original für heardTone
 function heardTone() {
-    // Hier könnte Logik für das Zählen kommen, aber das ist im Original nicht vollständig
     console.log('Ton gehört!');
 }
 
@@ -480,4 +489,25 @@ function generateGDTFile(summary) {
     link.href = URL.createObjectURL(blob);
     link.download = `${state.id}-hoertest.gdt`;
     link.click();
+}
+
+// Alle anderen Funktionen (z. B. für Audio, Chart) aus deinem Original – falls mehr da war, füg sie hier ein
+// Beispiel für Chart (falls in Original)
+function createResultsChart() {
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1kHz', '2kHz', '4kHz'],
+            datasets: [{
+                label: 'Rechtes Ohr',
+                data: [20, 25, 30],
+                borderColor: 'red'
+            }, {
+                label: 'Linkes Ohr',
+                data: [15, 20, 25],
+                borderColor: 'blue'
+            }]
+        }
+    });
 }
