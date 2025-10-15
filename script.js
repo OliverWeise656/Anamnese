@@ -47,25 +47,59 @@ let state = {
     id: null // Neue State für ID
 };
 
-// NEU: Globale Button-Listeners (werden am Anfang gebunden)
+// Globale Event-Listener für Buttons (am Anfang binden)
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Seite geladen – starte Consent-Modal'); // Debug
     showConsentModal();
 
-    // Globaler Listener für ID-OK und Test-ID (funktioniert immer)
+    // Globale Klick-Handler
     document.addEventListener('click', (e) => {
-        if (e.target.id === 'id-ok') {
+        if (e.target.id === 'consent-yes') {
+            document.getElementById('consent-modal').classList.add('hidden');
+            console.log('Consent gegeben – starte ID'); // Debug
+            generateAndShowId();
+        } else if (e.target.id === 'consent-no') {
+            alert('Ohne Einwilligung können wir die Tests nicht fortsetzen.');
+        } else if (e.target.id === 'id-ok') {
             document.getElementById('id-modal').classList.add('hidden');
             console.log('ID-OK geklickt – starte Chatbot'); // Debug
-            // Starte Chatbot
             document.getElementById('chatbot').classList.add('hidden'); // Verstecke Chatbot
             document.getElementById('userInput').style.display = 'block'; // Zeige Eingabefeld
             document.querySelector('button[onclick="sendMessage()"]').style.display = 'block'; // Zeige Senden-Button
         } else if (e.target.id === 'test-id-button') {
             const idDisplay = document.getElementById('id-display');
             idDisplay.textContent = Math.random().toString(36).substring(2, 10).toUpperCase(); // Test-ID
-            console.log('Test-ID gesetzt'); // Debug
+            console.log('Test-ID gesetzt:', idDisplay.textContent); // Debug
             state.id = idDisplay.textContent; // Setze State
+        } else if (e.target.id === 'startButton') {
+            const audio = new Audio('assets/tone.mp3'); // Passe Pfad an
+            audio.play();
+            e.target.disabled = true;
+            document.getElementById('stopButton').disabled = false;
+            audio.onended = () => {
+                e.target.disabled = false;
+            };
+        } else if (e.target.id === 'stopButton') {
+            document.getElementById('tone-setting').classList.add('hidden');
+            document.getElementById('initial-test').classList.remove('hidden');
+        } else if (e.target.id === 'start-initial-test-button') {
+            startInitialTest();
+        } else if (e.target.id === 'submit-initial-test-button') {
+            const answerInput = document.getElementById('answer-input');
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const words = ['Haus', 'Baum', 'Auto'];
+            if (userAnswer === words[state.currentWordIndex - 1].toLowerCase()) state.initialTestScore++;
+            answerInput.value = '';
+            playWord();
+        } else if (e.target.id === 'start-hearing-test-button') {
+            startHearingTest();
+        } else if (e.target.id === 'nextButton') {
+            const responseInput = document.getElementById('response');
+            const userAnswer = responseInput.value.trim().toLowerCase();
+            const words = ['Haus', 'Baum', 'Auto'];
+            if (userAnswer === words[state.currentWordIndex - 1].toLowerCase()) state.hearingTestScore++;
+            responseInput.value = '';
+            playWord();
         }
     });
 });
@@ -76,16 +110,8 @@ function showConsentModal() {
     if (modal) {
         modal.classList.remove('hidden');
         console.log('Consent-Modal gezeigt'); // Debug
-        document.getElementById('consent-yes').addEventListener('click', () => {
-            modal.classList.add('hidden');
-            console.log('Consent gegeben – starte ID'); // Debug
-            generateAndShowId();
-        });
-        document.getElementById('consent-no').addEventListener('click', () => {
-            alert('Ohne Einwilligung können wir die Tests nicht fortsetzen.');
-        });
     } else {
-        generateAndShowId(); // Fallback
+        console.log('Consent-Modal nicht gefunden – Fallback'); // Debug
     }
 }
 
@@ -500,65 +526,4 @@ function generateGDTFile(summary) {
     link.href = URL.createObjectURL(blob);
     link.download = `${state.id}-hoertest.gdt`;
     link.click();
-}
-
-// Dein Original für startButton und stopButton
-document.addEventListener('DOMContentLoaded', () => {
-    const startButton = document.getElementById('startButton');
-    const stopButton = document.getElementById('stopButton');
-    if (startButton) {
-        startButton.addEventListener('click', () => {
-            const audio = new Audio('assets/tone.mp3'); // Passe Pfad an
-            audio.play();
-            startButton.disabled = true;
-            stopButton.disabled = false;
-            audio.onended = () => {
-                startButton.disabled = false;
-            };
-        });
-    }
-    if (stopButton) {
-        stopButton.addEventListener('click', () => {
-            // Pause Audio
-            document.getElementById('tone-setting').classList.add('hidden');
-            document.getElementById('initial-test').classList.remove('hidden');
-        });
-    }
-
-    const startInitialTestButton = document.getElementById('start-initial-test-button');
-    if (startInitialTestButton) {
-        startInitialTestButton.addEventListener('click', startInitialTest);
-    }
-
-    const startHearingTestButton = document.getElementById('start-hearing-test-button');
-    if (startHearingTestButton) {
-        startHearingTestButton.addEventListener('click', startHearingTest);
-    }
-
-    const nextButton = document.getElementById('nextButton');
-    if (nextButton) {
-        nextButton.addEventListener('click', () => {
-            // Deine Original-Logik für Nächstes Wort
-        });
-    }
-});
-
-// Dein Original für Chart
-function createResultsChart() {
-    const ctx = document.getElementById('resultsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['1kHz', '2kHz', '4kHz'],
-            datasets: [{
-                label: 'Rechtes Ohr',
-                data: [20, 25, 30],
-                borderColor: 'red'
-            }, {
-                label: 'Linkes Ohr',
-                data: [15, 20, 25],
-                borderColor: 'blue'
-            }]
-        }
-    });
 }
