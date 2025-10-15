@@ -49,6 +49,7 @@ let state = {
 
 // Sicherstellen, dass das Consent-Modal zuerst kommt
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Seite geladen – starte Consent-Modal'); // Debug
     showConsentModal();
 });
 
@@ -57,14 +58,17 @@ function showConsentModal() {
     const modal = document.getElementById('consent-modal');
     if (modal) {
         modal.classList.remove('hidden');
+        console.log('Consent-Modal gezeigt'); // Debug
         document.getElementById('consent-yes').addEventListener('click', () => {
             modal.classList.add('hidden');
+            console.log('Consent gegeben – starte ID'); // Debug
             generateAndShowId();
         });
         document.getElementById('consent-no').addEventListener('click', () => {
             alert('Ohne Einwilligung können wir die Tests nicht fortsetzen.');
         });
     } else {
+        console.log('Consent-Modal nicht gefunden – Fallback zu ID.'); // Debug
         generateAndShowId(); // Fallback
     }
 }
@@ -84,15 +88,22 @@ function generateAndShowId() {
         idDisplay.textContent = id; // Setze die ID
         console.log('ID generiert und gesetzt:', id); // Debug
         document.getElementById('id-modal').classList.remove('hidden');
+        console.log('ID-Modal gezeigt'); // Debug
         document.getElementById('id-ok').addEventListener('click', () => {
             document.getElementById('id-modal').classList.add('hidden');
+            console.log('ID-OK geklickt – starte Chatbot'); // Debug
             // Starte Chatbot
             document.getElementById('chatbot').classList.add('hidden'); // Verstecke Chatbot
             document.getElementById('userInput').style.display = 'block'; // Zeige Eingabefeld
             document.querySelector('button[onclick="sendMessage()"]').style.display = 'block'; // Zeige Senden-Button
         });
+        // NEU: Test-Knopf für Debug
+        document.getElementById('test-id-button').addEventListener('click', () => {
+            idDisplay.textContent = Math.random().toString(36).substring(2, 10).toUpperCase(); // Test-ID
+            console.log('Test-ID gesetzt'); // Debug
+        });
     } else {
-        console.log('ID-Display nicht gefunden – ID:', id);
+        console.log('ID-Display nicht gefunden – ID:', id); // Debug
     }
 }
 
@@ -194,7 +205,7 @@ async function appendRow(values) {
     }
 }
 
-// Dein Original für getDoctorResponse (erweitert mit Logik)
+// Dein Original für getDoctorResponse (erweitert)
 async function getDoctorResponse(userInput) {
     // Deine Original-API-Logik (OpenAI oder so)
     // Placeholder: Einfache Antwort basierend auf Alter
@@ -491,8 +502,48 @@ function generateGDTFile(summary) {
     link.click();
 }
 
-// Alle anderen Funktionen (z. B. für Audio, Chart) aus deinem Original – falls mehr da war, füg sie hier ein
-// Beispiel für Chart (falls in Original)
+// Dein Original für startButton und stopButton
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            const audio = new Audio('assets/tone.mp3'); // Passe Pfad an
+            audio.play();
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            audio.onended = () => {
+                startButton.disabled = false;
+            };
+        });
+    }
+    if (stopButton) {
+        stopButton.addEventListener('click', () => {
+            // Pause Audio (falls nötig)
+            document.getElementById('tone-setting').classList.add('hidden');
+            document.getElementById('initial-test').classList.remove('hidden');
+        });
+    }
+
+    const startInitialTestButton = document.getElementById('start-initial-test-button');
+    if (startInitialTestButton) {
+        startInitialTestButton.addEventListener('click', startInitialTest);
+    }
+
+    const startHearingTestButton = document.getElementById('start-hearing-test-button');
+    if (startHearingTestButton) {
+        startHearingTestButton.addEventListener('click', startHearingTest);
+    }
+
+    const nextButton = document.getElementById('nextButton');
+    if (nextButton) {
+        nextButton.addEventListener('click', () => {
+            // Deine Original-Logik für Nächstes Wort
+        });
+    }
+});
+
+// Dein Original für Chart
 function createResultsChart() {
     const ctx = document.getElementById('resultsChart').getContext('2d');
     new Chart(ctx, {
