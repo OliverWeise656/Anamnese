@@ -103,53 +103,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/2.9.0/dom-to-image-more.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Supabase Client für DB-Speicherung -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <div id="consent-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: #fff; padding: 20px; border-radius: 8px; max-width: 500px; text-align: center;">
+            <h2>Datenschutz-Einwilligung</h2>
+            <p>Ich stimme zu, dass meine anonymisierten Ergebnisse (ohne Namen) per Supabase-Cloud gespeichert und an die Praxis weitergeleitet werden. Die ID wird nur zur Zuordnung verwendet.</p>
+            <button id="consent-yes">Ja, einverstanden</button>
+            <button id="consent-no">Nein, abbrechen</button>
+        </div>
+    </div>
+
+    <div id="id-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: #fff; padding: 20px; border-radius: 8px; max-width: 500px; text-align: center;">
+            <h2>Ihre Untersuchungs-ID</h2>
+            <p id="id-display" style="font-size: 1.5em; color: #007bff;"></p>
+            <p>Machen Sie einen Screenshot oder notieren Sie sich die ID für die Praxis.</p>
+            <button id="id-ok">OK</button>
+        </div>
+    </div>
+
     <div id="chatbot">
-         <div style="color: white; margin-top: 33em; text-align: center; font-size: 1.5em;">
-    Hallo Welt!<p>
-    
-</div>   
+        <div style="color: white; margin-top: 33em; text-align: center; font-size: 1.5em;">
+            Hallo Welt!<p>
+        </div>   
         <h1><span style="color: blue;">Ihre Buchung war erfolgreich!</span></h1>
-      <p><span style="color: blue;">Schauen Sie bitte auch in Ihren SPAM Ordner!</span></p>
-        <p>Wenn Sie uns das erste Mal besuchen oder eine akute Hör- oder Stimmstörung beklagen, bitten wir Sie, die folgenden Online-Tests durchzuführen.<p><span style="color: green;"> Ansonsten ist Ihre Buchung an dieser Stelle abgeschlossen.</span>
-
-<p>Beantworten Sie die Fragen stichwortartig und führen Sie die Tests nach bestem Können durch. Dauer: maximal 10 Minuten.</p>
-    
- <p><span style="color: red;">Bringen Sie die Ergebnisse ausgedruckt zum Termin in die Praxis mit.</span><p>Sollten Sie die Tests nicht sofort durchführen können, erhalten Sie in den Erinnerungsmails einen Link, um sie später zu ergänzen.<p><p><span style="color: blue;">Ihre Vorteile:</span>
-
-Weniger Zeitaufwand und Folgetermine in der Praxis,
-Verlaufskontrollen,
-Übungsmöglichkeit für Kinder,
-Wichtige Referenzwerte.
-<p>  <span style="color: red;">Wenn Sie mit der Testdurchführung Schwierigkeiten haben, ist das jedoch kein Hindernis für Ihren Besuch!
-</span>
-        <p><span style="color: green;">Für Patienten unter 4 Jahren sind die Fragen und Tests nicht erforderlich. Wenn Sie ohne Eingabe auf "Weiter" drücken, gelangen Sie direkt zu den Tests.</span></p>
-    
-        <p><span style="color: red;">Geben Sie zunächst das Alter des Patienten ALS REINE ZAHL ein:</span></p>
-    
-      <div id="messages"></div>
-<input type="text" id="userInput" placeholder="Ihre Nachricht...">
-<button onclick="sendMessage()">Weiter</button>
-<button id="manualContinueButton" class="hidden">Weiter zu den Tests</button>
-
+        <p><span style="color: blue;">Schauen Sie bitte auch in Ihren SPAM Ordner!</span></p>
+        <p>Wenn Sie uns das erste Mal besuchen oder eine akute Hör- oder Stimmstörung beklagen, bitten wir Sie, die folgenden Online-Tests durchzuführen.<p><span style="color: green;"> Ansonsten ist Ihre Buchung an dieser Stelle abgeschlossen.</span></p>
+        <p>Beantworten Sie die Fragen stichwortartig und führen Sie die Tests nach bestem Können durch. Dauer: maximal 10 Minuten.</p>
+        <p><span style="color: green;">Ihre Ergebnisse werden automatisch an die Praxis übermittelt. Notieren Sie sich die Untersuchungs-ID, die Sie erhalten, und teilen Sie sie bei Ihrem Termin mit.</span></p>
+        <p>Sollten Sie die Tests nicht sofort durchführen können, erhalten Sie in den Erinnerungsmails einen Link...</p>
     </div>
 
     <div id="tone-setting" class="hidden">
-      <div style="color: white; margin-top: 20em; text-align: center; font-size: 1.5em;">
-    Hallo Welt!<p>
-    
-</div>   
-        <h1>Ton-Einstellung</h1> 
-      <p><span style="color: red;">Falls Sie "nur" wegen Stimmstörungen oder einem anderen Grund kommen, machen Sie dennoch diesen Hörtest. Er dient uns als Referenz.</span> <p>
-        <p>Für die folgenden Tests ist es notwendig, Ihren Ton einzustellen. Gehen Sie dazu bitte in eine ruhige Umgebung und nutzen Sie am besten einen Kopfhörer. Wenn Sie den Test mit Hörgeräten durchführen oder gemeinsam mit Ihrem Kind machen, können Sie auch den Lautsprecher Ihres Rechners verwenden, um zu hören, was Ihr Kind nachsprechen oder als gehört anzeigen soll.</p>
+        <h1>Ton-Einstellung</h1>
+        <p>Die folgenden Tests werden mit Kopfhörern durchgeführt. Wenn Sie keine Kopfhörer zur Hand haben, können Sie die Tests auch ohne durchführen. In diesem Fall ist das Ergebnis jedoch nicht so aussagekräftig. <p>Bitte achten Sie darauf, dass der Test in einer ruhigen Umgebung durchgeführt wird. <p>Der Test ist so konzipiert, dass das Kind nachsprechen oder als gehört anzeigen soll.</p>
         <p>Nach dem Drücken von „Start“ hören Sie einen Ton. Stellen Sie die Lautstärke Ihres Kopfhörers oder Lautsprechers so ein, dass der Patient den Ton AUF DEM BESSEREN OHR gerade noch hören kann. <p>Falls Sie ohne Kopfhörer arbeiten, stellen Sie den Ton etwas lauter ein. <p>Wenn Sie die Einstellung beendet haben, drücken Sie „Stopp“. <p>Es folgen dann 3 unterschiedliche Hörtests.</p>
         <button id="startButton">Start</button>
         <button id="stopButton" disabled>Stopp</button>
     </div>
 
     <div id="initial-test" class="hidden">
-        <h1 id="initial-test-heading">Sprachverständnis-Test</h1></p> Tragen Sie das gehörte Wort in das dafür vorgesehene Feld ein. Wenn Sie das Wort nicht verstehen, lassen Sie das Feld bitte leer und bestätigen Sie ohne Eintrag.<p><span style="color: red;">Wichtig zu beachten: Bei den folgenden Tests ist es unmöglich, die volle Punktzahl zu erreichen. Hier werden bewusst Grenzen ausgelotet!</span><p>
+        <h1 id="initial-test-heading">Sprachverständnis-Test</h1></p> Tragen Sie das gehört Wort in das dafür vorgesehene Feld ein. Wenn Sie das Wort nicht verstehen, lassen Sie das Feld bitte leer und bestätigen Sie ohne Eintrag.<p><span style="color: red;">Wichtig zu beachten: Bei den folgenden Tests ist es unmöglich, die volle Punktzahl zu erreichen. Hier werden bewusst Grenzen ausgelotet!</span><p>
         <p id="initial-instructions">Bitte drücken Sie den Button, um den Test zu starten.</p>
         <button id="start-initial-test-button">Test starten</button>
         <div id="test-area">
@@ -195,7 +192,8 @@ Wichtige Referenzwerte.
     <div id="final-result" class="hidden"></div>
     <div id="thank-you" class="hidden">
         <h1>Herzlichen Dank für Ihre Mitarbeit.</h1>
-        <p>Auf Ihrem Desktop wurden folgende PDF abgelegt: Anamnese und Testergebnisse.pdf, Diskrimination.pdf und Dichotisch.pdf . Bitte bringen Sie diese ausgedruckt zu Ihrem Besuch bei uns mit oder senden Sie diese unter dem BETREFF "TerminWeise" mit Besuchsdatum und Zeit bei uns an folgende eMail Adresse: info@hno-stuttgart.com. Auf diese Weise gewährleisten Sie einen reibungslosen Ablauf ihres Besuches bei uns!<p> Bitte beachten Sie, dass der Hörtest besonderer Interpretation bedarf und nur für den Gebrauch in unserer Praxis vorgesehen ist!</p>
+        <p>Ihre Ergebnisse wurden automatisch in unserer Cloud gespeichert und an die Praxis übermittelt. Notieren Sie sich die Untersuchungs-ID, die Sie zu Beginn erhalten haben, und teilen Sie sie bei Ihrem Termin mit, damit wir Ihre Daten zuordnen können.</p>
+        <p>Bitte beachten Sie, dass der Hörtest besonderer Interpretation bedarf und nur für den Gebrauch in unserer Praxis vorgesehen ist!</p>
     </div>
 
     <script src="script.js"></script>
